@@ -29,7 +29,7 @@ Behavior of this function depends on implementation.
 * `ErrorNoWrap(err error) error` - function pseudo-wrapper. This function **should not** modify passed error - this rule independent for implementation.
 All implementation of `ErrorNoWrap` function **must follow this rule**.
 * `ErrNoWrap(err error) error` - just alias for `ErrorNoWrap`.
-* `ErrorNoWrapOrNil(err error) error` - same with `ErrorNoWrap` function.
+* `ErrorNoWrapOrNil(err error) error` - same with `ErrorNoWrap` function. Please dont use this function - deprecated.
 * `ErrNoWrapOrNil(err error) error` - same with `ErrorNoWrapOrNil` function.
 * `ErrorOnly(err error, details ...string) error` - error wrapper function. This function wrap origin error in new error.
 Behavior of this function depends on implementation. Passed additional `details` **must** be added to the error text.
