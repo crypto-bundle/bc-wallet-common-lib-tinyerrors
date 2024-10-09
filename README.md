@@ -4,7 +4,7 @@
 Small error-wrapper library. This library used as default error wrapper in applications or another libraries. 
 Direct usage of this library as target dependency is allowed by crypto-bundle code-style. 
 Crypto-bundle code-style allows direct usage in applications and another libraries. This allowance is important because 
-main error-formatter library - [bc-wallet-common-lib-errors](crypto-bundle/bc-wallet-common-lib-errors) - 
+main error-formatter library - [bc-wallet-common-lib-errors](https://github.com/crypto-bundle/bc-wallet-common-lib-errors) - 
 does not allow usage target usage in another libraries, just in application.  
 
 The ideal future for this library is to be at version v1.0.0 forever and never change.
