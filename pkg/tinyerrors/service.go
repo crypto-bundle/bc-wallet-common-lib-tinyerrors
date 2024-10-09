@@ -1,6 +1,7 @@
 package tinyerrors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -19,7 +20,12 @@ func (s *FmtService) ErrGetCode(err error) int {
 	return s.ErrorGetCode(err)
 }
 
-func (s *FmtService) ErrorGetCode(_ error) int {
+func (s *FmtService) ErrorGetCode(err error) int {
+	var ccErr *codeContainsError
+	if errors.As(err, &ccErr) {
+		return ccErr.code
+	}
+
 	return -1
 }
 
@@ -27,8 +33,11 @@ func (s *FmtService) ErrWithCode(err error, code int) error {
 	return s.ErrorWithCode(err, code)
 }
 
-func (s *FmtService) ErrorWithCode(err error, _ int) error {
-	return err
+func (s *FmtService) ErrorWithCode(err error, code int) error {
+	return &codeContainsError{
+		Err:  err,
+		code: code,
+	}
 }
 
 func (s *FmtService) ErrNoWrap(err error) error {

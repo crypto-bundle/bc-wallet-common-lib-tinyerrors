@@ -6,6 +6,98 @@ import (
 )
 
 func TestErrorFormatting(t *testing.T) {
+	t.Run("ErrorWithCode", func(t *testing.T) {
+		const expectedResult = "test error"
+
+		err := ErrorWithCode(errors.New("test error"), 15)
+		if err.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResult)
+		}
+	})
+
+	t.Run("ErrWithCode", func(t *testing.T) {
+		const expectedResult = "test error"
+
+		err := ErrWithCode(errors.New("test error"), 25)
+		if err.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResult)
+		}
+	})
+
+	t.Run("ErrorGetCode", func(t *testing.T) {
+		const (
+			expectedResult = "test error"
+			expectedCode   = 42
+		)
+
+		err := ErrorWithCode(errors.New("test error"), expectedCode)
+		if err.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResult)
+		}
+
+		if code := ErrorGetCode(err); code != expectedCode {
+			t.Errorf("error code not equal with expected. current: %d, expected: %d",
+				code, expectedCode)
+		}
+	})
+
+	t.Run("ErrGetCode", func(t *testing.T) {
+		const (
+			expectedResult = "test error"
+			expectedCode   = 69
+		)
+
+		err := ErrWithCode(errors.New("test error"), expectedCode)
+		if err.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResult)
+		}
+
+		if code := ErrGetCode(err); code != expectedCode {
+			t.Errorf("error code not equal with expected. current: %d, expected: %d",
+				code, expectedCode)
+		}
+	})
+
+	t.Run("ErrorNoWrap", func(t *testing.T) {
+		const expectedResult = "test error"
+
+		err := ErrorNoWrap(errors.New("test error"))
+		if err.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResult)
+		}
+	})
+
+	t.Run("ErrorNoWrapOrNil", func(t *testing.T) {
+		const expectedResult = "test error"
+
+		err := ErrorNoWrapOrNil(nil)
+		if err != nil {
+			t.Errorf("error should be nil. current: %e",
+				err)
+		}
+
+		errTwo := ErrorNoWrapOrNil(errors.New(expectedResult))
+		if errTwo.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				errTwo.Error(), expectedResult)
+		}
+	})
+
+	t.Run("ErrNoWrap", func(t *testing.T) {
+		const expectedResult = "test error"
+
+		err := ErrNoWrap(errors.New("test error"))
+		if err.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResult)
+		}
+	})
+
 	t.Run("error only", func(t *testing.T) {
 		const expectedResult = "test error -> abc"
 
