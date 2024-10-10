@@ -12,4 +12,5 @@
 * Added examples of library usage:
   * Error code wrapping [code_wrapping/main.go](/examples/code_wrapping/main.go)
   * Error wrapping [error_wrapping/main.go](/examples/error_wrapping/main.go)
+  * Error re-wrapping [error_re_wrapping/main.go](/examples/error_re_wrapping/main.go)
   * New error creation [error_creating/main.go](/examples/error_creation/main.go)

@@ -20,9 +20,8 @@ Main 'errfmt' interface described in [common.go](/pkg/tinyerrors/common.go) file
 
 The interface requires the implementation of the following functions:
 
-* `ErrorWithCode(err error, code int) error` - error wrapper function which not modified error text, just for storing internal error code. 
-This function fully depend on implementation of error formatter service. In standard error formatter service-component this function has not storing code value,
-just return origin error.
+* `ErrorWithCode(err error, code int) error` - error wrapper function which not modified error text, just for storing internal error code in error. 
+This function fully depend on implementation of error formatter service.
 * `ErrWithCode(err error, code int) error` - it's just alias for `ErrorWithCode`. 
 * `ErrorGetCode(err error) int` - function for extract code from error. Function return -1 if code not stored in error.
 Behavior of this function depends on implementation.
@@ -30,7 +29,7 @@ Behavior of this function depends on implementation.
 * `ErrorNoWrap(err error) error` - function pseudo-wrapper. This function **should not** modify passed error - this rule independent for implementation.
 All implementation of `ErrorNoWrap` function **must follow this rule**.
 * `ErrNoWrap(err error) error` - just alias for `ErrorNoWrap`.
-* `ErrorNoWrapOrNil(err error) error` - same with `ErrorNoWrap` function. Please dont use this function - deprecated.
+* `ErrorNoWrapOrNil(err error) error` - same with `ErrorNoWrap` function. Please don't use this function - deprecated.
 * `ErrNoWrapOrNil(err error) error` - same with `ErrorNoWrapOrNil` function.
 * `ErrorOnly(err error, details ...string) error` - error wrapper function. This function wrap origin error in new error.
 Behavior of this function depends on implementation. Passed additional `details` **must** be added to the error text.
@@ -44,16 +43,24 @@ Passed additional `details` **must be** added to the error text. Behavior depend
 Error text format pass to function as argument. Compiled by specific format message **should** exit in error text. Behavior depends on implementation.
 
 ### ErrorWithCode, ErrWithCode, ErrorGetCode, ErrGetCode
+Main purpose of this function - wrap business-logic error-status code in error. This use-case relevant as communication option between application layers -
+you don't need use `errors.Is` and import errors from another application layers and sub-package, all you need - it can just compare `int` values. 
+This function fully depend on implementation of error formatter service. Standard implementation of `tinyerrors` package, presented in [errors.go](/pkg/tinyerrors/errors.go),
+storing code value in non-exported struct `codeContainsError` [types.go](/pkg/tinyerrors/types.go), which wrap origin error.
+
+Full information about these functions with programming code examples you can see in [code_wrapping.md](/docs/code_wrapping.md) file.
+Also, examples of error=code wrapping presented in:
+* [code_wrapping/main.go](/examples/code_wrapping/main.go) - HTTP-server application with example of code wrapping
+* [code_wrapping/main.go](/pkg/tinyerrors/errors_test.go) - Unit-tests
 
 ### ErrorNoWrap, ErrNoWrap, ErrorNoWrapOrNil, ErrNoWrapOrNil
 
-### ErrorOnly
+### ErrorOnly, Error
+You can see examples of error wrapping in next files:
+* [code_wrapping/main.go](/examples/code_wrapping/main.go)
+* [code_wrapping/main.go](/pkg/tinyerrors/errors_test.go)
 
-### Error
-
-### NewError
-
-### NewErrorf
+### NewError, NewErrorf
 
 ## Contributors
 

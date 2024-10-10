@@ -110,7 +110,7 @@ func (h *handler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
 
 		rawData, err := json.Marshal(respData)
 		if err != nil {
-			h.serveError(respWriter, tinyerrors.NewError("request process error",
+			h.serveError(respWriter, tinyerrors.ErrorOnly(ErrUnableProcessRequest,
 				CodeUnableToMarshalData.String()))
 		}
 
@@ -125,15 +125,17 @@ func (h *handler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	h.serveError(respWriter, tinyerrors.NewErrorf("shit happend: %d, %s",
-		CodeUnableToProcessRequestUnluckyNumber, CodeUnableToProcessRequestUnluckyNumber.String()))
+	h.serveError(respWriter, tinyerrors.ErrorOnly(ErrUnableProcessRequest,
+		CodeUnableToProcessRequestUnluckyNumber.String()))
 }
 
 func (h *handler) serveError(respWriter http.ResponseWriter, err error) {
+	reWrappedError := tinyerrors.Error(err, "additional data", "re-wrap example")
+
 	respData := &responseModelError{
 		Message:      "unable to process request",
 		ActionID:     uint(h.counter.Load()),
-		ErrorDetails: err.Error(),
+		ErrorDetails: reWrappedError.Error(),
 	}
 
 	rawData, err := json.Marshal(respData)
@@ -173,7 +175,7 @@ func main() {
 
 	//nolint:exhaustruct // it's ok here. we don't need to fully fill up http.Server struct
 	server := &http.Server{
-		Addr:         "localhost:8082",
+		Addr:         "localhost:8084",
 		Handler:      mux,
 		ReadTimeout:  time.Second * 3,
 		WriteTimeout: time.Second * 3,

@@ -97,7 +97,7 @@ type handler struct {
 	counter atomic.Uint64
 }
 
-func (h *handler) ServeHTTP(respWriter http.ResponseWriter, httpReq *http.Request) {
+func (h *handler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
 	newCounterValue := h.counter.Add(1)
 	if newCounterValue%2 == 0 {
 		respData := responseModel{
@@ -125,8 +125,8 @@ func (h *handler) ServeHTTP(respWriter http.ResponseWriter, httpReq *http.Reques
 		return
 	}
 
-	h.serveError(respWriter,
-		tinyerrors.ErrorWithCode(ErrUnableProcessRequest, int(CodeUnableToProcessRequestUnluckyNumber)))
+	h.serveError(respWriter, tinyerrors.ErrorWithCode(ErrUnableProcessRequest,
+		int(CodeUnableToProcessRequestUnluckyNumber)))
 }
 
 func (h *handler) serveError(respWriter http.ResponseWriter, err error) {
