@@ -120,6 +120,22 @@ func TestErrorFormatting(t *testing.T) {
 		}
 	})
 
+	t.Run("ErrorNoWrapOrNil", func(t *testing.T) {
+		const expectedResult = "test error"
+
+		err := ErrNoWrapOrNil(nil)
+		if err != nil {
+			t.Errorf("error should be nil. current: %e",
+				err)
+		}
+
+		errTwo := ErrNoWrapOrNil(errors.New(expectedResult))
+		if errTwo.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				errTwo.Error(), expectedResult)
+		}
+	})
+
 	t.Run("ErrNoWrap", func(t *testing.T) {
 		const expectedResult = "test error"
 

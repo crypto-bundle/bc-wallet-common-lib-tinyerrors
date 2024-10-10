@@ -15,14 +15,15 @@ and standard implementation.
 
 In case of code change first you need - disable read-only(archive) mode in repository settings.
 
-### Common error formatter interface
+## Error formatter service interface
 Main 'errfmt' interface described in [common.go](/pkg/tinyerrors/common.go) file.
 
 The interface requires the implementation of the following functions:
 
 * `ErrorWithCode(err error, code int) error` - error wrapper function which not modified error text, just for storing internal error code. 
-This function fully depend on errfmt implementation. In standard error formatter service-component this function has not storing code value, just return origin error.
-* `ErrWithCode(err error, code int) error` - just alias for `ErrorWithCode`. 
+This function fully depend on implementation of error formatter service. In standard error formatter service-component this function has not storing code value,
+just return origin error.
+* `ErrWithCode(err error, code int) error` - it's just alias for `ErrorWithCode`. 
 * `ErrorGetCode(err error) int` - function for extract code from error. Function return -1 if code not stored in error.
 Behavior of this function depends on implementation.
 * `ErrGetCode(err error) int` - just alias for `ErrorGetCode`.
@@ -41,6 +42,18 @@ but error message will be formatted in passed format. Specific behavior depends 
 Passed additional `details` **must be** added to the error text. Behavior depends on implementation.
 * `NewErrorf(format string, args ...interface{}) error` - function to create a new error with specific format. 
 Error text format pass to function as argument. Compiled by specific format message **should** exit in error text. Behavior depends on implementation.
+
+### ErrorWithCode, ErrWithCode, ErrorGetCode, ErrGetCode
+
+### ErrorNoWrap, ErrNoWrap, ErrorNoWrapOrNil, ErrNoWrapOrNil
+
+### ErrorOnly
+
+### Error
+
+### NewError
+
+### NewErrorf
 
 ## Contributors
 

@@ -57,6 +57,17 @@ func ErrorNoWrapOrNil(err error) error {
 	return nil
 }
 
+// ErrNoWrapOrNil - pseudo-wrapper function which return error in origin state. Just alias for ErrorNoWrapOrNil.
+// Deprecated: Please don't use this function - candidate for deletion. Use ErrorNoWrap or ErrNoWrap instead of it.
+// Function removed from interface ErrorFormatterService requirements...
+func ErrNoWrapOrNil(err error) error {
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ErrorWithCode(err error, code int) error {
 	return DefaultErrorFormatterSvc.ErrorWithCode(err, code)
 }
