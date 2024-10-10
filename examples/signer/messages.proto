@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package signer;
+
+option go_package = "/main";
+
+enum ErrorReasons {
+  ACCESS_TOKEN_NOT_FOUND = 0;
+  ACCESS_TOKEN_EXPIRED = 1;
+  SIGNATURE_FLOW_FAILED = 2;
+}
+
+message SignDataRequest {
+  string WalletUUID = 1;
+  string TokenUUID = 2;
+  bytes DataForSign = 3;
+}
+
+message SignDataResponse {
+  string WalletUUID = 1;
+  bytes SignedData = 2;
+}
+
+service SignerApi {
+  rpc SignData                      (SignDataRequest)                returns (SignDataResponse) {}
+}

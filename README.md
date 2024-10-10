@@ -50,14 +50,16 @@ storing code value in non-exported struct `codeContainsError` [types.go](/pkg/ti
 
 Full information about these functions with programming code examples you can see in [status_code_wrapping.md](/docs/status_code_wrapping.md) file.
 Also, examples of error=code wrapping presented in:
-* [code_wrapping/main.go](/examples/code_wrapping/main.go) - HTTP-server application with example of code wrapping
-* [code_wrapping/main.go](/pkg/tinyerrors/errors_test.go) - Unit-tests
+* [signer application](/examples/signer) - gRPC-server application for sign user-data, witch contains example of error status-code wrapping.
+  * [signer/marshaller.go](/examples/signer/marshaller.go)
+  * [signer/handlers.go](/examples/signer/handlers.go)
+* [unit tests](/pkg/tinyerrors/errors_test.go) - Unit-tests for all error formatter methods
 
 ### ErrorNoWrap, ErrNoWrap, ErrorNoWrapOrNil, ErrNoWrapOrNil
 
 ### ErrorOnly, Error
 You can see examples of error wrapping in next files:
-* [code_wrapping/main.go](/examples/code_wrapping/main.go)
+* [code_wrapping/main.go](/examples/signer/main.go)
 * [code_wrapping/main.go](/pkg/tinyerrors/errors_test.go)
 
 ### NewError, NewErrorf

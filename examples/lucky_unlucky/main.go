@@ -45,7 +45,7 @@ import (
 	"syscall"
 	"time"
 
-	"bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 )
 
 type ErrorCode int
@@ -59,7 +59,7 @@ const (
 
 var (
 	CodeUnableToMarshalDataName                 = "unable to marshal response data"
-	CodeUnableToProcessRequestUnluckyNumberName = "unable to process request, just unlucky request number value. " +
+	CodeUnableToProcessRequestUnluckyNumberName = "just unlucky request number value. " +
 		"Please try again later"
 )
 
@@ -86,10 +86,9 @@ type responseModel struct {
 }
 
 type responseModelError struct {
-	Message          string `json:"message"`
-	ErrorDescription string `json:"error_description"`
-	ActionID         uint   `json:"action_id"`
-	ErrorCode        uint   `json:"error_code"`
+	Message      string `json:"message"`
+	ErrorDetails string `json:"error_details"`
+	ActionID     uint   `json:"action_id"`
 }
 
 type handler struct {
@@ -111,7 +110,8 @@ func (h *handler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
 
 		rawData, err := json.Marshal(respData)
 		if err != nil {
-			h.serveError(respWriter, tinyerrors.ErrWithCode(err, int(CodeUnableToMarshalData)))
+			h.serveError(respWriter, tinyerrors.ErrorOnly(ErrUnableProcessRequest,
+				CodeUnableToMarshalData.String()))
 		}
 
 		respWriter.WriteHeader(http.StatusOK)
@@ -125,18 +125,15 @@ func (h *handler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	h.serveError(respWriter, tinyerrors.ErrorWithCode(ErrUnableProcessRequest,
-		int(CodeUnableToProcessRequestUnluckyNumber)))
+	h.serveError(respWriter, tinyerrors.ErrorOnly(ErrUnableProcessRequest,
+		CodeUnableToProcessRequestUnluckyNumber.String()))
 }
 
 func (h *handler) serveError(respWriter http.ResponseWriter, err error) {
-	errCode := ErrorCode(tinyerrors.ErrorGetCode(err))
-
 	respData := &responseModelError{
-		Message:          err.Error(),
-		ActionID:         uint(h.counter.Load()),
-		ErrorCode:        uint(errCode),
-		ErrorDescription: errCode.String(),
+		Message:      "unable to process request",
+		ActionID:     uint(h.counter.Load()),
+		ErrorDetails: err.Error(),
 	}
 
 	rawData, err := json.Marshal(respData)
@@ -176,7 +173,7 @@ func main() {
 
 	//nolint:exhaustruct // it's ok here. we don't need to fully fill up http.Server struct
 	server := &http.Server{
-		Addr:         "localhost:8081",
+		Addr:         "localhost:8083",
 		Handler:      mux,
 		ReadTimeout:  time.Second * 3,
 		WriteTimeout: time.Second * 3,
