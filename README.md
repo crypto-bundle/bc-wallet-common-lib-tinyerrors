@@ -48,7 +48,7 @@ you don't need use `errors.Is` and import errors from another application layers
 This function fully depend on implementation of error formatter service. Standard implementation of `tinyerrors` package, presented in [errors.go](/pkg/tinyerrors/errors.go),
 storing code value in non-exported struct `codeContainsError` [types.go](/pkg/tinyerrors/types.go), which wrap origin error.
 
-Full information about these functions with programming code examples you can see in [code_wrapping.md](/docs/code_wrapping.md) file.
+Full information about these functions with programming code examples you can see in [status_code_wrapping.md](/docs/status_code_wrapping.md) file.
 Also, examples of error=code wrapping presented in:
 * [code_wrapping/main.go](/examples/code_wrapping/main.go) - HTTP-server application with example of code wrapping
 * [code_wrapping/main.go](/pkg/tinyerrors/errors_test.go) - Unit-tests

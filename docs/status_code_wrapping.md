@@ -42,7 +42,9 @@ type pbResponse struct {
 }
 
 type processor struct {
+	// tokenStorage - implementation of token storage service-component from another package... 
 	tokenStorage tokenStorageService
+	// signer - implementation of data signer service-component from another package...
 	signer signerService
 }
 
@@ -94,16 +96,19 @@ func (p *processor) processSignRequest(ctx context.Context,
 ) ([]byte, error) {
 	isExists, err := p.tokenStorage.IsTokenExistsByUUID(tokeUUID, walletUUID)
 	if err != nil {
+		// wrapping errors from another package 
 		return nil, tinyerrors.ErrorOnly(err)
 	}
 
 	if !isExists {
+		// wrapping errors from another package with internal status code
 		return nil, tinyerrors.ErrorWithCode(ErrTokenNotFound, TinyErrCodeAccessTokenNotRegistered)
 	}
 
 	signedData, err := p.signer.SignData(dataForSign, walletUUID)
 	if err != nil {
-		return nil, tinyerrors.ErrorWithCode(err, TinyErrCodeUnableToSign)
+		// pseudo-wrapping errors from another package. Because this error already has status-code
+		return nil, tinyerrors.ErrorNoWrap(err)
 	}
 	
 	return signedData, nil
