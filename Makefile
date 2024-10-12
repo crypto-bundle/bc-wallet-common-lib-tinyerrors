@@ -1,5 +1,11 @@
 lint:
-	golangci-lint run --config .golangci.yml -v ./...
+	golangci-lint run --config .golangci.yml -v ./pkg/tinyerrors
+
+coinflip: coinflip_gomod
+
+coinflip_gomod:
+	go mod tidy -C ./examples/coinflip
+	go mod vendor -C ./examples/coinflip
 
 signer: signer_proto signer_gomod
 

@@ -9,17 +9,16 @@ does not allow usage target usage in another libraries, just in application.
 
 The ideal future for this library is to be at version v1.0.0 forever and never change.
 
-Repository 'bc-wallet-common-lib-tinyerrors' instantly in read-only mode. Code of this library should never change.
+Repository `bc-wallet-common-lib-tinyerrors` instantly in read-only mode. Code of this library should never change.
 Restriction on read-only mode can be removed only if you need change description of main error-formatter interface 
 and standard implementation. 
 
 In case of code change first you need - disable read-only(archive) mode in repository settings.
 
 ## Error formatter service interface
-Main 'errfmt' interface described in [common.go](/pkg/tinyerrors/common.go) file.
+Main `errfmt` interface described in [common.go](/pkg/tinyerrors/common.go) file. All implementations must follow interface requirements.
 
-The interface requires the implementation of the following functions:
-
+The interface requires the implementation of the these functions:
 * `ErrorWithCode(err error, code int) error` - error wrapper function which not modified error text, just for storing internal error code in error. 
 This function fully depend on implementation of error formatter service.
 * `ErrWithCode(err error, code int) error` - it's just alias for `ErrorWithCode`. 
@@ -42,14 +41,20 @@ Passed additional `details` **must be** added to the error text. Behavior depend
 * `NewErrorf(format string, args ...interface{}) error` - function to create a new error with specific format. 
 Error text format pass to function as argument. Compiled by specific format message **should** exit in error text. Behavior depends on implementation.
 
+Default implementation described in [service.go](/pkg/tinyerrors/service.go) and assigned to public variable - `DefaultErrorFormatterSvc`.
+If you need u can change default error formatter service by calling `SetDefault(fmtSvc ErrorFormatterService)` function. 
+If the capabilities of the standard formatter are not enough for you - use the implementations from the 
+[bc-wallet-common-lib-errors](https://github.com/crypto-bundle/bc-wallet-common-lib-errors) repository, all changes that expand the capabilities and 
+functionality of the formatter must be committed there.
+
 ### ErrorWithCode, ErrWithCode, ErrorGetCode, ErrGetCode
-Main purpose of this function - wrap business-logic error-status code in error. This use-case relevant as communication option between application layers -
+Main purpose of these functions - wrap business logic error status-code in error. This use-case relevant as communication option between application layers -
 you don't need use `errors.Is` and import errors from another application layers and sub-package, all you need - it can just compare `int` values. 
 This function fully depend on implementation of error formatter service. Standard implementation of `tinyerrors` package, presented in [errors.go](/pkg/tinyerrors/errors.go),
 storing code value in non-exported struct `codeContainsError` [types.go](/pkg/tinyerrors/types.go), which wrap origin error.
 
-Full information about these functions with programming code examples you can see in [status_code_wrapping.md](/docs/status_code_wrapping.md) file.
-Also, examples of error=code wrapping presented in:
+Full information about these functions with programming code examples you can see in [docs/status_code_wrapping.md](/docs/status_code_wrapping.md) file.
+Also, examples of error status-code wrapping presented in:
 * [signer application](/examples/signer) - gRPC-server application for sign user-data, witch contains example of error status-code wrapping.
   * [signer/marshaller.go](/examples/signer/marshaller.go)
   * [signer/handlers.go](/examples/signer/handlers.go)
@@ -58,9 +63,20 @@ Also, examples of error=code wrapping presented in:
 ### ErrorNoWrap, ErrNoWrap, ErrorNoWrapOrNil, ErrNoWrapOrNil
 
 ### ErrorOnly, Error
-You can see examples of error wrapping in next files:
-* [code_wrapping/main.go](/examples/signer/main.go)
-* [code_wrapping/main.go](/pkg/tinyerrors/errors_test.go)
+Typical usage of these functions - wrap existing error to new error with additional details.
+
+More information about errors wrap and re-wrap you can read in [docs/error_wrap.md](/docs/error_wrap.md). 
+Error wrapping is simply to use, but be careful with re-wrap already wrapped error.
+
+You can see examples of error wrapping in example application `coinflip`, which located in:
+* [coinflip application](/examples/coinflip) - HTTP-server application which make coin-flip on each HTTP-request.
+  * [coinflip/presenter.go](/examples/coinflip/presenter.go)
+  * [coinflip/handlers.go](/examples/coinflip/handlers.go)
+
+Also, examples of error wrapping located in [unit-tests](/pkg/tinyerrors/errors_test.go)
+
+Format for new error message depend on implementation of error fmt service. Another implementation of these functions and  you can see in
+[bc-wallet-common-lib-errors](https://github.com/crypto-bundle/bc-wallet-common-lib-errors)
 
 ### NewError, NewErrorf
 
