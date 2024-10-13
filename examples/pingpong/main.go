@@ -34,131 +34,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"log"
-	"math/rand/v2"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync/atomic"
 	"syscall"
 	"time"
-
-	"bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 )
-
-type ErrorCode int
-
-const (
-	RandLimit = 6000
-
-	CodeUnableToMarshalData ErrorCode = iota + 5000
-	CodeUnableToProcessRequestUnluckyNumber
-)
-
-var (
-	CodeUnableToMarshalDataName                 = "unable to marshal response data"
-	CodeUnableToProcessRequestUnluckyNumberName = "just unlucky request number value. " +
-		"Please try again later"
-)
-
-var (
-	ErrUnableProcessRequest = errors.New("unable to process request")
-)
-
-func (c ErrorCode) String() string {
-	switch c {
-	case CodeUnableToMarshalData:
-		return CodeUnableToMarshalDataName
-	case CodeUnableToProcessRequestUnluckyNumber:
-		return CodeUnableToProcessRequestUnluckyNumberName
-	default:
-		return "<nil>"
-	}
-}
-
-type responseModel struct {
-	ActionName string `json:"action_name"`
-	Message    string `json:"message"`
-	ActionID   uint   `json:"action_id"`
-	Weight     uint   `json:"weight"`
-}
-
-type responseModelError struct {
-	Message      string `json:"message"`
-	ErrorDetails string `json:"error_details"`
-	ActionID     uint   `json:"action_id"`
-}
-
-type handler struct {
-	logger  *log.Logger
-	counter atomic.Uint64
-}
-
-func (h *handler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
-	newCounterValue := h.counter.Add(1)
-	if newCounterValue%2 == 0 {
-		respData := responseModel{
-			ActionName: "serve_http",
-			Message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-				"Donec sed nunc at mauris efficitur iaculis sit amet ac dui. " +
-				"Sed lacinia suscipit risus sit amet sodales.",
-			ActionID: uint(newCounterValue),
-			Weight:   rand.UintN(RandLimit),
-		}
-
-		rawData, err := json.Marshal(respData)
-		if err != nil {
-			h.serveError(respWriter, tinyerrors.NewError("request process error",
-				CodeUnableToMarshalData.String()))
-		}
-
-		respWriter.WriteHeader(http.StatusOK)
-		_, err = respWriter.Write(rawData)
-		if err != nil {
-			h.logger.Println("unable to write response")
-
-			return
-		}
-
-		return
-	}
-
-	h.serveError(respWriter, tinyerrors.NewErrorf("shit happend: %d, %s",
-		CodeUnableToProcessRequestUnluckyNumber, CodeUnableToProcessRequestUnluckyNumber.String()))
-}
-
-func (h *handler) serveError(respWriter http.ResponseWriter, err error) {
-	respData := &responseModelError{
-		Message:      "unable to process request",
-		ActionID:     uint(h.counter.Load()),
-		ErrorDetails: err.Error(),
-	}
-
-	rawData, err := json.Marshal(respData)
-	if err != nil {
-		respWriter.WriteHeader(http.StatusInternalServerError)
-		respWriter.Header().Set("Content-Type", "text/plain")
-
-		_, err = respWriter.Write([]byte("internal error"))
-		if err != nil {
-			h.logger.Println("unable to write response")
-
-			return
-		}
-	}
-
-	respWriter.WriteHeader(http.StatusOK)
-	respWriter.Header().Set("Content-Type", "application/json")
-
-	_, err = respWriter.Write(rawData)
-	if err != nil {
-		h.logger.Println("unable to write response")
-
-		return
-	}
-}
 
 func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -166,7 +49,7 @@ func main() {
 	logger := log.Default()
 
 	mux := http.NewServeMux()
-	mux.Handle("/handle", &handler{
+	mux.Handle("/ping", &handler{
 		logger:  logger,
 		counter: atomic.Uint64{},
 	})

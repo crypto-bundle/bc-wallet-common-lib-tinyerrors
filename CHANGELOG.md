@@ -13,4 +13,4 @@
   * Error code wrapping [signer/](/examples/signer/)
   * Error wrapping [error_wrapping/main.go](/examples/coinflip/main.go)
   * Error re-wrapping [error_re_wrapping/main.go](/examples/error_re_wrapping/main.go)
-  * New error creation [error_creating/main.go](/examples/error_creation/main.go)
+  * New error creation [error_creating/main.go](/examples/pingpong/main.go)
