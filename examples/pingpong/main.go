@@ -35,10 +35,8 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
-	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -48,42 +46,21 @@ func main() {
 
 	logger := log.Default()
 
-	mux := http.NewServeMux()
-	mux.Handle("/ping", &handler{
-		logger:  logger,
-		counter: atomic.Uint64{},
-	})
+	pongHandlerSvc := NewPongHandler()
+	pongServerSvc := NewPongServer(pongHandlerSvc)
 
-	//nolint:exhaustruct // it's ok here. we don't need to fully fill up http.Server struct
-	server := &http.Server{
-		Addr:         "localhost:8082",
-		Handler:      mux,
-		ReadTimeout:  time.Second * 3,
-		WriteTimeout: time.Second * 3,
-		ErrorLog:     logger,
+	err := pongServerSvc.Prepare()
+	if err != nil {
+		logger.Fatal("unable to prepare pong server", err)
 	}
 
-	go func() {
-		err := server.ListenAndServe()
-		if err != nil {
-			logger.Println("unable to start http server", err)
+	err = pongServerSvc.ListenAndServe(ctx)
+	if err != nil {
+		logger.Fatal("unable to start pong server", err)
+	}
 
-			return
-		}
-	}()
-
-	go func() {
-		<-ctx.Done()
-
-		err := server.Shutdown(ctx)
-		if err != nil {
-			logger.Println("unable to shutdown http server", err)
-
-			return
-		}
-
-		logger.Println("http server successfully shutdown")
-	}()
+	pingWorkerSvc := NewPingWorker()
+	pingWorkerSvc.Run(ctx)
 
 	logger.Println("application started successfully")
 

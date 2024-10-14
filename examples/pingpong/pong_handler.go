@@ -35,7 +35,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"sync/atomic"
+
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 )
 
 type pongHandler struct {
@@ -44,6 +47,21 @@ type pongHandler struct {
 	coinFlipCounter atomic.Uint64
 }
 
-func (h *pongHandler) ServeHTTP(respWriter http.ResponseWriter, req *http.Request) {
+func (h *pongHandler) ServeHTTP(respWriter http.ResponseWriter, _ *http.Request) {
+	respWriter.Header().Set("Content-Type", "plain/text")
+	respWriter.WriteHeader(http.StatusOK)
+	_, err := respWriter.Write([]byte("pong"))
+	if err != nil {
+		h.logger.Println(tinyerrors.ErrorOnly(err, "unable to write response data"))
 
+		return
+	}
+}
+
+func NewPongHandler() *pongHandler {
+	return &pongHandler{
+		logger:          log.New(os.Stdout, "ping_worker", log.Ldate),
+		counter:         atomic.Uint64{},
+		coinFlipCounter: atomic.Uint64{},
+	}
 }

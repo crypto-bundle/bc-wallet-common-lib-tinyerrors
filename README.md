@@ -50,7 +50,9 @@ functionality of the formatter must be committed there.
 ### ErrorWithCode, ErrWithCode, ErrorGetCode, ErrGetCode
 Main purpose of these functions - wrap business logic error status-code in error. This use-case relevant as communication option between application layers -
 you don't need use `errors.Is` and import errors from another application layers and sub-package, all you need - it can just compare `int` values. 
-This function fully depend on implementation of error formatter service. Standard implementation of `tinyerrors` package, presented in [errors.go](/pkg/tinyerrors/errors.go),
+This function fully depend on implementation of error formatter service. 
+
+Standard implementation of `tinyerrors` package, presented in [errors.go](/pkg/tinyerrors/errors.go),
 storing code value in non-exported struct `codeContainsError` [types.go](/pkg/tinyerrors/types.go), which wrap origin error.
 
 Full information about these functions with programming code examples you can see in [docs/status_code_wrapping.md](/docs/status_code_wrapping.md) file.
@@ -61,6 +63,13 @@ Also, examples of error status-code wrapping presented in:
 * [unit tests](/pkg/tinyerrors/errors_test.go) - Unit-tests for all error formatter methods
 
 ### ErrorNoWrap, ErrNoWrap, ErrorNoWrapOrNil, ErrNoWrapOrNil
+These functions use for pseudo-wrapping. This function **should not** modify passed error. If you make new implementation
+of error formatter service, please follow this rule.
+Main purpose of these function - prevent error re-wrap or pass error on next level without wrap, but make linter clear code.
+
+Usage example in
+
+* [unit tests](/pkg/tinyerrors/errors_test.go) - Unit-tests for all error formatter methods
 
 ### ErrorOnly, Error
 Typical usage of these functions - wrap existing error to new error with additional details.
@@ -79,6 +88,15 @@ Format for new error message depend on implementation of error fmt service. Anot
 [bc-wallet-common-lib-errors](https://github.com/crypto-bundle/bc-wallet-common-lib-errors)
 
 ### NewError, NewErrorf
+If you need to create new error - these functions best solution for it. Crypto-bundle code-style does not recommend making dynamic errors,
+if you need it - use it.
+
+Example of usage presented in [pingpong application](/examples/pingpong):
+* [pingpong/ping_worker.go](/examples/pingpong/ping_worker.go)
+* [pingpong/pong_handler.go](/examples/pingpong/pong_handler.go)
+* [pingpong/pong_server.go](/examples/pingpong/pong_server.go)
+
+[Unit-tests](/pkg/tinyerrors/errors_test.go) also contains examples of usage.
 
 ## Contributors
 

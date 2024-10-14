@@ -66,6 +66,8 @@ func (s *pongServer) ListenAndServe(ctx context.Context) error {
 
 		log.Println("http server successfully shutdown")
 	}()
+
+	return nil
 }
 
 func (s *pongServer) Prepare() error {
@@ -79,6 +81,7 @@ func (s *pongServer) Prepare() error {
 
 func NewPongServer(handler pongHandlerService) *pongServer {
 	return &pongServer{
+		handler: handler,
 		httpServer: &http.Server{
 			Addr:         "localhost:8082",
 			Handler:      handler,

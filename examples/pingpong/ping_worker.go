@@ -31,3 +31,77 @@
  */
 
 package main
+
+import (
+	"context"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"time"
+)
+
+type pingWorker struct {
+	ticker *time.Ticker
+	client *http.Client
+	logger *log.Logger
+}
+
+func (w *pingWorker) Run(ctx context.Context) {
+	w.ticker = time.NewTicker(time.Second * 3)
+
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-w.ticker.C:
+				err := w.onTick(ctx)
+				if err != nil {
+					w.logger.Println("ping flow failed", err)
+				}
+
+				w.logger.Println("ping-pong success")
+			}
+		}
+	}()
+}
+
+func (w *pingWorker) onTick(_ context.Context) error {
+	resp, err := w.client.Get("http://localhost:8082/ping")
+	if err != nil {
+		return tinyerrors.ErrorNoWrap(err)
+	}
+	defer func() {
+		closeErr := tinyerrors.ErrorNoWrap(resp.Body.Close())
+		if closeErr != nil {
+			w.logger.Printf("unable to close resp body %e", closeErr)
+		}
+	}()
+
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+
+	_, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return tinyerrors.NewErrorf("unable to read response: %s, status-code: %s",
+			err.Error(), resp.Status)
+	}
+
+	return tinyerrors.NewErrorf("request ended with wrong status-code: %s", resp.Status)
+}
+
+func NewPingWorker() *pingWorker {
+	return &pingWorker{
+		ticker: nil,
+		client: &http.Client{
+			Transport:     http.DefaultTransport,
+			CheckRedirect: nil,
+			Jar:           nil,
+			Timeout:       time.Second,
+		},
+		logger: log.New(os.Stdout, "ping_worker ", log.LstdFlags),
+	}
+}
