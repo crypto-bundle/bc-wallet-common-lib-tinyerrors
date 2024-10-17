@@ -86,18 +86,18 @@ func (p *signRequestHandle) processSignRequest(_ context.Context,
 	}
 
 	if !isExists {
-		// wrapping errors from another package with internal status code
+		// wrapping errors internal package error with status code
 		return nil, tinyerrors.ErrorWithCode(ErrTokenNotFound, TinyErrCodeAccessTokenNotRegistered.Int())
 	}
 
 	isTokenExpired, err := p.tokenStorageSvc.IsTokenExpiredByUUID(tokeUUID, walletUUID)
 	if err != nil {
-		// example of wrapping errors from another package, no wrapping error status code here - internal error
+		// example of wrapping errors from interface, no wrapping error status code here - internal error
 		return nil, tinyerrors.ErrorOnly(err)
 	}
 
 	if !isTokenExpired {
-		// wrapping errors from another package with internal status code
+		// wrapping errors internal package error with status code
 		return nil, tinyerrors.ErrorWithCode(ErrTokenExpired, TinyErrCodeAccessTokenExpired.Int())
 	}
 

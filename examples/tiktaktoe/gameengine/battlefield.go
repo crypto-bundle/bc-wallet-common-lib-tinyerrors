@@ -31,3 +31,14 @@
  */
 
 package gameengine
+
+import (
+	"github.com/google/uuid"
+)
+
+type battleField struct {
+	Players []uuid.UUID
+	Fields  []uint8
+	Size    uint8
+	UUID    uuid.UUID
+}

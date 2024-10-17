@@ -74,6 +74,8 @@ func (w *pingWorker) onTick(_ context.Context) error {
 		return tinyerrors.ErrorNoWrap(err)
 	}
 	defer func() {
+		// example of pseudo-wrap error here. We don't need wrap error because error is not propagated
+		// to another layer of the application. Here just example, and prevention of wrapcheck linter issues.
 		closeErr := tinyerrors.ErrorNoWrap(resp.Body.Close())
 		if closeErr != nil {
 			w.logger.Printf("unable to close resp body %e", closeErr)
@@ -86,6 +88,7 @@ func (w *pingWorker) onTick(_ context.Context) error {
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
+		// example of formatted error here. Here we make new error by passed pattern
 		return tinyerrors.NewErrorf("unable to read response: %s, status-code: %s",
 			err.Error(), resp.Status)
 	}

@@ -1,6 +1,23 @@
 lint:
 	golangci-lint run --config .golangci.yml -v ./pkg/tinyerrors
 
+tiktaktoe: tiktaktoe_proto tiktaktoe_gomod
+
+tiktaktoe_gomod:
+	go mod tidy -C ./examples/tiktaktoe
+	go mod vendor -C ./examples/tiktaktoe
+
+tiktaktoe_proto:
+	protoc -I ./examples/tiktaktoe/ \
+		--go_out=./examples/tiktaktoe/ \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=./examples/tiktaktoe/ \
+		--go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=./examples/tiktaktoe/ \
+		--grpc-gateway_opt=logtostderr=true \
+		--grpc-gateway_opt=paths=source_relative \
+		./examples/tiktaktoe/*.proto
+
 coinflip: coinflip_gomod
 
 coinflip_gomod:

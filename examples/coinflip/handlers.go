@@ -37,7 +37,7 @@ import (
 	"log"
 	"net/http"
 	"sync/atomic"
-	
+
 	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 )
 
@@ -55,6 +55,9 @@ func (h *handler) ServeHTTP(respWriter http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Example of error wrap. Error message will contain one additional detail.
+	// Result of wrap will something like this:
+	// unable to process request -> just unlucky request number value. Please try again later
 	h.serveError(respWriter, tinyerrors.ErrorOnly(ErrUnableProcessRequest,
 		CodeUnableToProcessRequestUnluckyNumber.String()))
 }
@@ -69,6 +72,9 @@ func (h *handler) serveCoinFlip(respWriter http.ResponseWriter, req *http.Reques
 
 	rawData, err := newResponseModelPresenter(coinSide, req.RequestURI, uint(h.counter.Load()))
 	if err != nil {
+		// Example of error wrap. Error message will contain two additional details.
+		// Result of wrap will something like this:
+		// <error_message> -> unable marshal coin flip result message, tail
 		h.serveError(respWriter, tinyerrors.ErrorOnly(err,
 			"unable marshal coin flip result message", coinSide.String()))
 
@@ -79,7 +85,7 @@ func (h *handler) serveCoinFlip(respWriter http.ResponseWriter, req *http.Reques
 	respWriter.WriteHeader(http.StatusOK)
 	_, err = respWriter.Write(rawData)
 	if err != nil {
-		h.logger.Println("unable to write response")
+		h.logger.Println("unable to write response", err)
 
 		return
 	}

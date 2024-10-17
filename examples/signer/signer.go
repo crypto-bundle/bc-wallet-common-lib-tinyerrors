@@ -53,5 +53,6 @@ func (s *dataSigner) SignData(dataForSign []byte, walletUUID string) ([]byte, er
 		return []byte("signed data"), nil
 	}
 
+	// wrapping internal package error with status code
 	return nil, tinyerrors.ErrorWithCode(ErrUnableToSignData, TinyErrCodeUnableToSign.Int())
 }

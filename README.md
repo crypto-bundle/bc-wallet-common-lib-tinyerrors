@@ -67,6 +67,9 @@ These functions use for pseudo-wrapping. This function **should not** modify pas
 of error formatter service, please follow this rule.
 Main purpose of these function - prevent error re-wrap or pass error on next level without wrap, but make linter clear code.
 
+Main rule when you must use one of these functions - if function unexported - use pseudo-wrapper functions, if it possible.
+Anyway, it is the developer job to prevent error re-wrapping.  
+
 Usage example in
 
 * [unit tests](/pkg/tinyerrors/errors_test.go) - Unit-tests for all error formatter methods

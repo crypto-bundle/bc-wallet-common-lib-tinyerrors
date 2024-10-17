@@ -82,6 +82,9 @@ func newResponseModelPresenter(side CoinSide,
 
 	rawData, err := json.Marshal(respData)
 	if err != nil {
+		// example of pseudo-wrap error here. We don't need wrap error because trying to prevent re-wrap error in
+		// serveCoinFlip function. In case if we wrap error here via tinyerrors.ErrorOnly, caller function will
+		// wrap error again
 		return nil, tinyerrors.ErrorNoWrap(err)
 	}
 

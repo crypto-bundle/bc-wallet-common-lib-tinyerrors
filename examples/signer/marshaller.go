@@ -68,16 +68,15 @@ func (m *marshaller) MarshallErrorResponse(err error) error {
 
 func (m *marshaller) marshallErrorTokenNotFound(err error) error {
 	respErrStatus, _ := status.New(codes.PermissionDenied, "Token not found").
-		WithDetails(
-			&errdetails.ErrorInfo{
-				Reason: ErrorReasons_ACCESS_TOKEN_NOT_FOUND.String(),
-				Domain: Domain,
-				Metadata: map[string]string{
-					"internal_error_status_code": TinyErrCodeAccessTokenNotRegistered.Itoa(),
-					"internal_error_status_text": TinyErrCodeAccessTokenNotRegistered.String(),
-					"error_message":              err.Error(),
-				},
-			})
+		WithDetails(&errdetails.ErrorInfo{
+			Reason: ErrorReasons_ACCESS_TOKEN_NOT_FOUND.String(),
+			Domain: Domain,
+			Metadata: map[string]string{
+				"internal_error_status_code": TinyErrCodeAccessTokenNotRegistered.Itoa(),
+				"internal_error_status_text": TinyErrCodeAccessTokenNotRegistered.String(),
+				"error_message":              err.Error(),
+			},
+		})
 
 	return respErrStatus.Err()
 }
