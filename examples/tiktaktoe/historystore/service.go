@@ -31,3 +31,64 @@
  */
 
 package historystore
+
+import (
+	"context"
+	"errors"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+	"sync"
+	"tiktaktoe/types"
+
+	"tiktaktoe/models"
+
+	"github.com/google/uuid"
+)
+
+var (
+	ErrMatchInfoAlreadyExist = errors.New("match already exists")
+)
+
+type store struct {
+	mu sync.Mutex
+
+	matchMap map[uuid.UUID]*models.BattleField
+}
+
+func (s *store) GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField {
+	info, isExists := s.matchMap[matchUUID]
+	if !isExists {
+		return nil
+	}
+
+	return info
+}
+
+func (s *store) GetAllMatches(_ context.Context) []*models.BattleField {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	list := make([]*models.BattleField, 0, len(s.matchMap))
+	counter := 0
+
+	for _, matchInfo := range s.matchMap {
+		list[counter] = matchInfo
+		counter++
+	}
+
+	return list
+}
+
+func (s *store) AddMatchInfo(_ context.Context, info *models.BattleField) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_, isExists := s.matchMap[info.UUID]
+	if isExists {
+		return tinyerrors.ErrorWithCode(ErrMatchInfoAlreadyExist,
+			types.TinyErrCodeMatchAlreadyRegistered.Int())
+	}
+
+	s.matchMap[info.UUID] = info
+
+	return nil
+}

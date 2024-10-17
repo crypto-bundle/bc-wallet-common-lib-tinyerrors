@@ -30,5 +30,31 @@
  *
  */
 
-package gameengine
+package types
 
+import "strconv"
+
+type TinyErrStatusCode int
+
+const (
+	TinyErrCodeMatchAlreadyRegistered TinyErrStatusCode = iota + 7001
+
+	TinyErrCodeMatchAlreadyRegisteredText = "match_already_registered"
+)
+
+func (c TinyErrStatusCode) Itoa() string {
+	return strconv.Itoa(c.Int())
+}
+
+func (c TinyErrStatusCode) Int() int {
+	return int(c)
+}
+
+func (c TinyErrStatusCode) String() string {
+	switch c {
+	case TinyErrCodeMatchAlreadyRegistered:
+		return TinyErrCodeMatchAlreadyRegisteredText
+	default:
+		return "<nil>"
+	}
+}

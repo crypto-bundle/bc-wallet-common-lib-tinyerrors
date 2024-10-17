@@ -30,5 +30,29 @@
  *
  */
 
-package gameengine
+package types
 
+type MatchProgressStatus uint8
+
+const (
+	MatchStillInProgress MatchProgressStatus = iota + 1
+	MatchAlreadyEnded
+
+	MatchStillInProgressText = "match_still_in_progress"
+	MatchAlreadyEndedText    = "match_already_end"
+)
+
+func (c MatchProgressStatus) String() string {
+	switch c {
+	case MatchStillInProgress:
+		return MatchStillInProgressText
+	case MatchAlreadyEnded:
+		return MatchAlreadyEndedText
+	default:
+		return "<nil>"
+	}
+}
+
+type CurrentMovementStatus uint8
+
+type NextMovementStatus uint8

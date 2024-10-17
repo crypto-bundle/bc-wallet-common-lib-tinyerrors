@@ -30,5 +30,4 @@
  *
  */
 
-package gameengine
-
+package grpcserver

@@ -8,15 +8,15 @@ tiktaktoe_gomod:
 	go mod vendor -C ./examples/tiktaktoe
 
 tiktaktoe_proto:
-	protoc -I ./examples/tiktaktoe/ \
-		--go_out=./examples/tiktaktoe/ \
+	protoc -I ./examples/tiktaktoe/pkg/ \
+		--go_out=./examples/tiktaktoe/pkg/ \
 		--go_opt=paths=source_relative \
-		--go-grpc_out=./examples/tiktaktoe/ \
+		--go-grpc_out=./examples/tiktaktoe/pkg/ \
 		--go-grpc_opt=paths=source_relative \
-		--grpc-gateway_out=./examples/tiktaktoe/ \
+		--grpc-gateway_out=./examples/tiktaktoe/pkg/ \
 		--grpc-gateway_opt=logtostderr=true \
 		--grpc-gateway_opt=paths=source_relative \
-		./examples/tiktaktoe/*.proto
+		./examples/tiktaktoe/pkg/*.proto
 
 coinflip: coinflip_gomod
 

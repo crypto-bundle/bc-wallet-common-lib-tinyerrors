@@ -30,5 +30,27 @@
  *
  */
 
-package gameengine
+package models
 
+import "github.com/google/uuid"
+
+type BattleField struct {
+	Players [2]uuid.UUID
+	Fields  []uint8
+	Size    uint8
+	UUID    uuid.UUID
+}
+
+func (bf *BattleField) Clone() *BattleField {
+	data := *bf
+
+	return &data
+}
+
+func (bf *BattleField) GetSize() uint8 {
+	return bf.Size
+}
+
+func (bf *BattleField) GetUUID() uuid.UUID {
+	return bf.UUID
+}

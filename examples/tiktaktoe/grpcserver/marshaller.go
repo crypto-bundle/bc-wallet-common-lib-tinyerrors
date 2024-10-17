@@ -30,5 +30,6 @@
  *
  */
 
-package gameengine
+package grpcserver
 
+type marshaller struct{}
