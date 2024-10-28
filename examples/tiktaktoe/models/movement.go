@@ -30,19 +30,12 @@
  *
  */
 
-package gameengine
+package models
 
-import (
-	"github.com/google/uuid"
-	"sync"
-)
+import "github.com/google/uuid"
 
-type service struct {
-	mu sync.Mutex
-
-	battleFields map[string]*battleFieldWorker
-}
-
-func (w *battleFieldWorker) StartNewGame(playerOneUUID, playerTwoUUID uuid.UUID) error {
-	return nil
+type Movement struct {
+	PlayerUUID      uuid.UUID
+	Position        [2]uint8
+	BattleFieldUUID uuid.UUID
 }

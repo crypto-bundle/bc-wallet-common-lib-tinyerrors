@@ -32,17 +32,54 @@
 
 package gameengine
 
-import (
-	"github.com/google/uuid"
-	"sync"
-)
+import "testing"
 
-type service struct {
-	mu sync.Mutex
+func Test(t *testing.T) {
+	battleFields := NewFields(5)
 
-	battleFields map[string]*battleFieldWorker
+	t.Logf("battleField size %d", len(battleFields.fields))
+
+	battleFields.SetMove(0, 0, 1)
+	battleFields.SetMove(1, 0, 1)
+	battleFields.SetMove(2, 0, 1)
+	battleFields.SetMove(3, 0, 1)
+	isWin := battleFields.SetMove(4, 0, 1)
+
+	t.Logf("isWin %v", isWin)
 }
 
-func (w *battleFieldWorker) StartNewGame(playerOneUUID, playerTwoUUID uuid.UUID) error {
-	return nil
+func Test2(t *testing.T) {
+	battleFields := NewFields(3)
+
+	t.Logf("battleField size %d", len(battleFields.fields))
+
+	battleFields.SetMove(0, 0, 1)
+	battleFields.SetMove(0, 1, 1)
+	isWin := battleFields.SetMove(0, 2, 1)
+
+	t.Logf("isWin %v", isWin)
+}
+
+func Test3(t *testing.T) {
+	battleFields := NewFields(3)
+
+	t.Logf("battleField size %d", len(battleFields.fields))
+
+	battleFields.SetMove(0, 0, 1)
+	battleFields.SetMove(1, 1, 1)
+	isWin := battleFields.SetMove(2, 2, 1)
+
+	t.Logf("isWin %v", isWin)
+}
+
+func Test4(t *testing.T) {
+	battleFields := NewFields(3)
+
+	t.Logf("battleField size %d", len(battleFields.fields))
+
+	battleFields.SetMove(0, 2, 1)
+	battleFields.SetMove(1, 1, 1)
+	isWin := battleFields.SetMove(2, 0, 1)
+
+	t.Logf("isWin %v", isWin)
 }

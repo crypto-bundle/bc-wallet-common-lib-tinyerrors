@@ -32,4 +32,6 @@
 
 package app
 
-const Domain = "example_tiktaktoe_game"
+const (
+	Domain = "example_tiktaktoe_game"
+)

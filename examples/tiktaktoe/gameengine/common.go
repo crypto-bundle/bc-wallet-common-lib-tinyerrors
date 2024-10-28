@@ -33,16 +33,18 @@
 package gameengine
 
 import (
+	"context"
+
+	"tiktaktoe/models"
+
 	"github.com/google/uuid"
-	"sync"
 )
 
-type service struct {
-	mu sync.Mutex
+type gameStore interface {
+	AddMatchInfo(_ context.Context, info *models.BattleField) error
+	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
+	GetAllMatches(_ context.Context) []*models.BattleField
 
-	battleFields map[string]*battleFieldWorker
-}
-
-func (w *battleFieldWorker) StartNewGame(playerOneUUID, playerTwoUUID uuid.UUID) error {
-	return nil
+	AddMatchMovement(_ context.Context, movement *models.Movement) error
+	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
 }

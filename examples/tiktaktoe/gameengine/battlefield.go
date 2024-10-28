@@ -32,3 +32,32 @@
 
 package gameengine
 
+import (
+	"tiktaktoe/models"
+
+	"github.com/google/uuid"
+)
+
+type battleFieldWorker struct {
+	matchUUID uuid.UUID
+	roles     map[uuid.UUID]bool
+
+	fields [][]bool
+
+	battleFieldData *models.BattleField
+	movementHistory []*models.Movement
+}
+
+func (w *battleFieldWorker) SetMovement(playerUUID uuid.UUID, position [2]uint8) error {
+	x, y := position[0], position[1]
+
+	w.fields[x][y] = w.roles[playerUUID]
+
+	w.movementHistory = append(w.movementHistory, &models.Movement{
+		PlayerUUID:      playerUUID,
+		Position:        [2]uint8{x, y},
+		BattleFieldUUID: w.matchUUID,
+	})
+
+	return nil
+}

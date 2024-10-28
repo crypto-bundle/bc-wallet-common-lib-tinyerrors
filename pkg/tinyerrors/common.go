@@ -32,12 +32,14 @@
 
 package tinyerrors
 
+type TinyErrCodeInt int
+
 //nolint:interfacebloat //it's ok here, we need it we must use it as one big interface
 type ErrorFormatterService interface {
-	ErrorWithCode(err error, code int) error
-	ErrWithCode(err error, code int) error
-	ErrorGetCode(err error) int
-	ErrGetCode(err error) int
+	ErrorWithCode(err error, code TinyErrCodeInt) error
+	ErrWithCode(err error, code TinyErrCodeInt) error
+	ErrorGetCode(err error) TinyErrCodeInt
+	ErrGetCode(err error) TinyErrCodeInt
 	// ErrorNoWrap function for pseudo-wrap error, must be used in case of linter warnings...
 	ErrorNoWrap(err error) error
 	// ErrNoWrap same with ErrorNoWrap function, just alias for ErrorNoWrap, just short function name...

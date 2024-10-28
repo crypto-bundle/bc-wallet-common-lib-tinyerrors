@@ -36,7 +36,6 @@ import "github.com/google/uuid"
 
 type BattleField struct {
 	Players [2]uuid.UUID
-	Fields  []uint8
 	Size    uint8
 	UUID    uuid.UUID
 }

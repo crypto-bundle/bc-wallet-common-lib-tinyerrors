@@ -68,7 +68,7 @@ func ErrNoWrapOrNil(err error) error {
 	return nil
 }
 
-func ErrorWithCode(err error, code int) error {
+func ErrorWithCode(err error, code TinyErrCodeInt) error {
 	return DefaultErrorFormatterSvc.ErrorWithCode(err, code)
 }
 
