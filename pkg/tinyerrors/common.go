@@ -32,14 +32,39 @@
 
 package tinyerrors
 
+import "strconv"
+
+type TinyErrCode interface {
+	Itoa() string
+	Int() int
+	String() string
+	I18n() string
+}
+
 type TinyErrCodeInt int
+
+func (c TinyErrCodeInt) Itoa() string {
+	return strconv.Itoa(c.Int())
+}
+
+func (c TinyErrCodeInt) Int() int {
+	return int(c)
+}
+
+func (c TinyErrCodeInt) String() string {
+	return "missing_key"
+}
+
+func (c TinyErrCodeInt) I18n() string {
+	return "missing_i18n_key"
+}
 
 //nolint:interfacebloat //it's ok here, we need it we must use it as one big interface
 type ErrorFormatterService interface {
-	ErrorWithCode(err error, code TinyErrCodeInt) error
-	ErrWithCode(err error, code TinyErrCodeInt) error
-	ErrorGetCode(err error) TinyErrCodeInt
-	ErrGetCode(err error) TinyErrCodeInt
+	ErrorWithCode(err error, code TinyErrCode) error
+	ErrWithCode(err error, code TinyErrCode) error
+	ErrorGetCode(err error) TinyErrCode
+	ErrGetCode(err error) TinyErrCode
 	// ErrorNoWrap function for pseudo-wrap error, must be used in case of linter warnings...
 	ErrorNoWrap(err error) error
 	// ErrNoWrap same with ErrorNoWrap function, just alias for ErrorNoWrap, just short function name...

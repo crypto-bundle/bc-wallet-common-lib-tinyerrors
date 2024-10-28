@@ -63,15 +63,15 @@ func CheckForWin(f fields) (int, error) {
 
 func (f fields) SetMove(posX, posY uint8, symbol int) (int, error) {
 	if posX < 0 || posX > f.size {
-		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrFieldPositionOutOfMap.Int())
+		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrFieldPositionOutOfMap)
 	}
 
 	if posX < 0 || posY > f.size {
-		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrFieldPositionOutOfMap.Int())
+		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrFieldPositionOutOfMap)
 	}
 
 	if f.fields[posX][posY] != fieldDefaultValue {
-		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrFieldAlreadyTaken.Int())
+		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrFieldAlreadyTaken)
 	}
 
 	f.fields[posX][posY] = symbol
@@ -83,7 +83,7 @@ func (f fields) SetMove(posX, posY uint8, symbol int) (int, error) {
 
 	f.moveCount--
 	if f.moveCount == 0 {
-		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrAllFieldsTaken.Int())
+		return noWinnerResult, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrAllFieldsTaken)
 	}
 
 	return noWinnerResult, nil
@@ -98,7 +98,7 @@ func (f fields) checkForWin() (winner int, err error) {
 		}
 	}
 
-	return noWinnerResult, tinyerrors.ErrWithCode(ErrHasNoWinnerInMatch, types.TinyErrCodeHasNoWinner.Int())
+	return noWinnerResult, tinyerrors.ErrWithCode(ErrHasNoWinnerInMatch, types.TinyErrCodeHasNoWinner)
 }
 
 func (f fields) checkForWinBySymbol(symbol int) bool {

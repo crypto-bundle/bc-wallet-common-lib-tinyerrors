@@ -41,7 +41,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrorWithCode", func(t *testing.T) {
 		const expectedResult = "test error"
 
-		err := ErrorWithCode(errors.New("test error"), 15)
+		err := ErrorWithCode(errors.New("test error"), TinyErrCodeInt(15))
 		if err.Error() != expectedResult {
 			t.Errorf("error text not equal with expected. current: %s, expected: %s",
 				err.Error(), expectedResult)
@@ -51,7 +51,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrWithCode", func(t *testing.T) {
 		const expectedResult = "test error"
 
-		err := ErrWithCode(errors.New("test error"), 25)
+		err := ErrWithCode(errors.New("test error"), TinyErrCodeInt(15))
 		if err.Error() != expectedResult {
 			t.Errorf("error text not equal with expected. current: %s, expected: %s",
 				err.Error(), expectedResult)
@@ -61,7 +61,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrorGetCode", func(t *testing.T) {
 		const (
 			expectedResult = "test error"
-			expectedCode   = 42
+			expectedCode   = TinyErrCodeInt(42)
 		)
 
 		err := ErrorWithCode(errors.New("test error"), expectedCode)
@@ -79,7 +79,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrGetCode", func(t *testing.T) {
 		const (
 			expectedResult = "test error"
-			expectedCode   = 69
+			expectedCode   = TinyErrCodeInt(69)
 		)
 
 		err := ErrWithCode(errors.New("test error"), expectedCode)

@@ -68,19 +68,19 @@ func ErrNoWrapOrNil(err error) error {
 	return nil
 }
 
-func ErrorWithCode(err error, code TinyErrCodeInt) error {
+func ErrorWithCode(err error, code TinyErrCode) error {
 	return DefaultErrorFormatterSvc.ErrorWithCode(err, code)
 }
 
-func ErrWithCode(err error, code int) error {
+func ErrWithCode(err error, code TinyErrCode) error {
 	return DefaultErrorFormatterSvc.ErrWithCode(err, code)
 }
 
-func ErrorGetCode(err error) int {
+func ErrorGetCode(err error) TinyErrCode {
 	return DefaultErrorFormatterSvc.ErrorGetCode(err)
 }
 
-func ErrGetCode(err error) int {
+func ErrGetCode(err error) TinyErrCode {
 	return DefaultErrorFormatterSvc.ErrGetCode(err)
 }
 

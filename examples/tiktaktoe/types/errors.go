@@ -32,7 +32,9 @@
 
 package types
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type TinyErrStatusCode int
 
@@ -58,6 +60,10 @@ func (c TinyErrStatusCode) Itoa() string {
 
 func (c TinyErrStatusCode) Int() int {
 	return int(c)
+}
+
+func (c TinyErrStatusCode) I18n() string {
+	return c.String()
 }
 
 func (c TinyErrStatusCode) String() string {

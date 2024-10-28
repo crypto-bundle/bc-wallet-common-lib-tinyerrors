@@ -48,24 +48,24 @@ func (s *FmtService) ErrorNoWrapOrNil(err error) error {
 	return nil
 }
 
-func (s *FmtService) ErrGetCode(err error) int {
+func (s *FmtService) ErrGetCode(err error) TinyErrCode {
 	return s.ErrorGetCode(err)
 }
 
-func (s *FmtService) ErrorGetCode(err error) int {
+func (s *FmtService) ErrorGetCode(err error) TinyErrCode {
 	var ccErr *codeContainsError
 	if errors.As(err, &ccErr) {
 		return ccErr.code
 	}
 
-	return -1
+	return nil
 }
 
-func (s *FmtService) ErrWithCode(err error, code int) error {
+func (s *FmtService) ErrWithCode(err error, code TinyErrCode) error {
 	return s.ErrorWithCode(err, code)
 }
 
-func (s *FmtService) ErrorWithCode(err error, code int) error {
+func (s *FmtService) ErrorWithCode(err error, code TinyErrCode) error {
 	return &codeContainsError{
 		Err:  err,
 		code: code,
