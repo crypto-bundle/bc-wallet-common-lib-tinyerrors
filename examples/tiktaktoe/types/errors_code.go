@@ -46,14 +46,16 @@ const (
 	TinyErrFieldPositionOutOfMap
 	TinyErrAllFieldsTaken
 	TinyErrNotYourMovementOrder
+	TinyErrorUnableToCreateBattlefield
 
-	TinyErrCodeMatchAlreadyRegisteredText = "match_already_registered"
-	TinyErrCodeMatchNotRegisteredText     = "match_not_found"
-	TinyErrCodeHasNoWinnerText            = "has_no_winner_in_game"
-	TinyErrFieldAlreadyTakenText          = "field_already_taken"
-	TinyErrFieldPositionOutOfMapText      = "field_position_out_map"
-	TinyErrAllFieldsTakenText             = "all_field_taken_math_is_over"
-	TinyErrNotYourMovementOrderText       = "not_your_movement_order"
+	TinyErrCodeMatchAlreadyRegisteredText  = "match_already_registered"
+	TinyErrCodeMatchNotRegisteredText      = "match_not_found"
+	TinyErrCodeHasNoWinnerText             = "has_no_winner_in_game"
+	TinyErrFieldAlreadyTakenText           = "field_already_taken"
+	TinyErrFieldPositionOutOfMapText       = "field_position_out_map"
+	TinyErrAllFieldsTakenText              = "all_field_taken_math_is_over"
+	TinyErrNotYourMovementOrderText        = "not_your_movement_order"
+	TinyErrorUnableToCreateBattlefieldText = "unable_to_create_battlefield"
 )
 
 func (c TinyErrStatusCode) Itoa() string {
@@ -89,6 +91,8 @@ func (c TinyErrStatusCode) String() string {
 		return TinyErrAllFieldsTakenText
 	case TinyErrNotYourMovementOrder:
 		return TinyErrNotYourMovementOrderText
+	case TinyErrorUnableToCreateBattlefield:
+		return TinyErrorUnableToCreateBattlefieldText
 
 	default:
 		return "<nil>"

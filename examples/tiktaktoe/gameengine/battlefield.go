@@ -50,7 +50,12 @@ type battleFieldWorker struct {
 	fields                  tikTakToeFieldService
 	battleFieldStoreDataSvc matchDataStoreService
 
-	nextPlayer int
+	nextPlayer     int
+	movementsCount uint
+}
+
+func (w *battleFieldWorker) GetMatchUUID() uuid.UUID {
+	return w.matchUUID
 }
 
 func (w *battleFieldWorker) WhoIsNext(_ context.Context) uuid.UUID {
@@ -60,7 +65,7 @@ func (w *battleFieldWorker) WhoIsNext(_ context.Context) uuid.UUID {
 func (w *battleFieldWorker) SetMovement(ctx context.Context,
 	playerUUID uuid.UUID,
 	position [2]uint8,
-) (*types.MatchResult, error) {
+) (*models.MatchResult, error) {
 	playerSymbol := w.roles.GetSymbolByPlayerUUID(playerUUID)
 	if playerSymbol != w.nextPlayer {
 		return nil, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrNotYourMovementOrder)
@@ -82,29 +87,79 @@ func (w *battleFieldWorker) SetMovement(ctx context.Context,
 		return nil, tinyerrors.ErrorNoWrap(err)
 	}
 
-	movementsCount, err := w.battleFieldStoreDataSvc.GetMatchMovementsCount(ctx, w.matchUUID)
+	w.movementsCount++
+
+	if winner > 0 { // match is over. return match result
+		result, endErr := w.endMatch(ctx, winner)
+		if endErr != nil {
+			return nil, tinyerrors.ErrorNoWrap(endErr)
+		}
+
+		return result, nil
+	}
+
+	// match still in progress, set who's next
+	w.waitNextMove(ctx)
+
+	return nil, nil
+}
+
+func (w *battleFieldWorker) endMatch(ctx context.Context, winner int) (*models.MatchResult, error) {
+	matchResult := &models.MatchResult{
+		MatchUUID:     w.matchUUID,
+		WinnerUUID:    w.roles.GePlayerUUIDBySymbol(winner),
+		WinnerSign:    winner,
+		MovementCount: w.movementsCount,
+	}
+
+	err := w.battleFieldStoreDataSvc.AddMatchResult(ctx, matchResult)
 	if err != nil {
 		return nil, tinyerrors.ErrorNoWrap(err)
 	}
 
-	if winner > 0 { // match is over. return match result
-		return &types.MatchResult{
-			MatchUUID:     w.matchUUID,
-			WinnerUUID:    w.roles.GePlayerUUIDBySymbol(winner),
-			WinnerSign:    winner,
-			MovementCount: uint(movementsCount),
-		}, nil
-	}
+	return matchResult, nil
+}
 
+func (w *battleFieldWorker) waitNextMove(_ context.Context) {
 	// match still in progress, set who's next
-	if movementsCount%2 == 0 { // first move of "X". "X" equal to 1 symbol
+	if w.movementsCount%2 == 0 { // first move of "X". "X" equal to 1 symbol
 		w.nextPlayer = 1
 
-		return nil, nil
+		return
 	}
 
 	// second move of "O". "O" equal to 0 symbol
 	w.nextPlayer = 1
 
-	return nil, nil
+	return
+}
+
+func newBattlefield(playersUUID [2]uuid.UUID,
+	fieldSize int,
+	dataSvc matchDataStoreService,
+) (*battleFieldWorker, error) {
+	matchUUID, err := uuid.NewV7()
+	if err != nil {
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+	}
+
+	return &battleFieldWorker{
+		matchUUID: matchUUID,
+		roles: &roles{
+			// "X" equal to 1 symbol
+			// "O" equal to 0 symbol
+			symbolByPlayer: map[uuid.UUID]int{
+				playersUUID[0]: 1,
+				playersUUID[1]: 0,
+			},
+			playerBySymbol: map[int]uuid.UUID{
+				1: playersUUID[0],
+				0: playersUUID[1],
+			},
+		},
+		fields:                  NewFields(uint8(fieldSize)),
+		battleFieldStoreDataSvc: dataSvc,
+		nextPlayer:              1, // First player - X
+		movementsCount:          0,
+	}, nil
 }

@@ -32,28 +32,13 @@
 
 package models
 
-import (
-	"github.com/google/uuid"
-	"tiktaktoe/types"
-)
+import "github.com/google/uuid"
 
-type BattleField struct {
-	Players [2]uuid.UUID
-	Size    uint8
-	Status  types.MatchProgressStatus
-	UUID    uuid.UUID
-}
+type MatchResult struct {
+	MatchUUID uuid.UUID
 
-func (bf *BattleField) Clone() *BattleField {
-	data := *bf
+	WinnerUUID uuid.UUID
+	WinnerSign int
 
-	return &data
-}
-
-func (bf *BattleField) GetSize() uint8 {
-	return bf.Size
-}
-
-func (bf *BattleField) GetUUID() uuid.UUID {
-	return bf.UUID
+	MovementCount uint
 }

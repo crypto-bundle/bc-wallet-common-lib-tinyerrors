@@ -48,6 +48,8 @@ type matchDataStoreService interface {
 	AddMatchMovement(_ context.Context, movement *models.Movement) error
 	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
 	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
+
+	AddMatchResult(ctx context.Context, result *models.MatchResult) error
 }
 
 type tikTakToeFieldService interface {

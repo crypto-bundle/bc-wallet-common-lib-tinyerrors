@@ -33,16 +33,51 @@
 package gameengine
 
 import (
+	"context"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 	"github.com/google/uuid"
 	"sync"
+	"tiktaktoe/models"
+	"tiktaktoe/types"
 )
 
 type service struct {
 	mu sync.Mutex
 
-	battleFields map[string]*battleFieldWorker
+	battleFields map[uuid.UUID]*battleFieldWorker
+
+	battleFieldStoreDataSvc matchDataStoreService
 }
 
-func (w *battleFieldWorker) StartNewGame(playerOneUUID, playerTwoUUID uuid.UUID) error {
-	return nil
+func (s *service) StartNewGame(ctx context.Context,
+	playerOneUUID,
+	playerTwoUUID uuid.UUID,
+) (*models.BattleField, error) {
+	UUIDArr := [2]uuid.UUID{
+		playerOneUUID,
+		playerTwoUUID,
+	}
+
+	bf, err := newBattlefield(UUIDArr, 3, s.battleFieldStoreDataSvc)
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
+
+	s.mu.Lock()
+	s.battleFields[bf.GetMatchUUID()] = bf
+	s.mu.Unlock()
+
+	bfData := &models.BattleField{
+		Players: UUIDArr,
+		Size:    3,
+		Status:  types.MatchStillInProgress,
+		UUID:    bf.GetMatchUUID(),
+	}
+
+	err = s.battleFieldStoreDataSvc.AddMatchInfo(ctx, bfData)
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
+
+	return bfData, nil
 }
