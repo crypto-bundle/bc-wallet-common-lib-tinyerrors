@@ -30,42 +30,67 @@
  *
  */
 
-package grpcserver
+package types
 
 import (
-	"tiktaktoe/app"
-	pb "tiktaktoe/pkg"
-	"tiktaktoe/types"
-
-	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
-
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"strconv"
 )
 
-func (m *marshaller) marshallNewGameError(err error) error {
-	// example of extract error status code from error via tinyerrors.ErrorGetCode function
-	switch tinyerrors.ErrorGetCode(err) {
-	case types.TinyErrCodeMatchAlreadyRegistered:
-		return m.marshalNewGameErrorAlreadyRegistered(err)
+type TinyErrStatusCode int
 
-	default:
-		return status.Error(codes.Internal, err.Error())
-	}
+const (
+	TinyErrCodeMatchAlreadyRegistered TinyErrStatusCode = iota + 7001
+	TinyErrCodeMatchNotRegistered
+	TinyErrCodeHasNoWinner
+	TinyErrFieldAlreadyTaken
+	TinyErrFieldPositionOutOfMap
+	TinyErrAllFieldsTaken
+	TinyErrNotYourMovementOrder
+
+	TinyErrCodeMatchAlreadyRegisteredText = "match_already_registered"
+	TinyErrCodeMatchNotRegisteredText     = "match_not_found"
+	TinyErrCodeHasNoWinnerText            = "has_no_winner_in_game"
+	TinyErrFieldAlreadyTakenText          = "field_already_taken"
+	TinyErrFieldPositionOutOfMapText      = "field_position_out_map"
+	TinyErrAllFieldsTakenText             = "all_field_taken_math_is_over"
+	TinyErrNotYourMovementOrderText       = "not_your_movement_order"
+)
+
+func (c TinyErrStatusCode) Itoa() string {
+	return strconv.Itoa(c.Int())
 }
 
-func (m *marshaller) marshalNewGameErrorAlreadyRegistered(err error) error {
-	respErrStatus, _ := status.New(codes.PermissionDenied, "Match already exists").
-		WithDetails(&errdetails.ErrorInfo{
-			Reason: pb.ErrorReasons_MATCH_ALREADY_EXISTS.String(),
-			Domain: app.Domain,
-			Metadata: map[string]string{
-				"internal_error_status_code": types.TinyErrCodeMatchAlreadyRegistered.Itoa(),
-				"internal_error_status_text": types.TinyErrCodeMatchAlreadyRegistered.String(),
-				"error_message":              err.Error(),
-			},
-		})
+func (c TinyErrStatusCode) Int() int {
+	return int(c)
+}
 
-	return respErrStatus.Err()
+func (c TinyErrStatusCode) I18n() string {
+	return c.String()
+}
+
+func (c TinyErrStatusCode) String() string {
+	switch c {
+	case TinyErrCodeMatchAlreadyRegistered:
+		return TinyErrCodeMatchAlreadyRegisteredText
+
+	case TinyErrCodeMatchNotRegistered:
+		return TinyErrCodeMatchNotRegisteredText
+
+	case TinyErrCodeHasNoWinner:
+		return TinyErrCodeHasNoWinnerText
+
+	case TinyErrFieldAlreadyTaken:
+		return TinyErrFieldAlreadyTakenText
+
+	case TinyErrFieldPositionOutOfMap:
+		return TinyErrFieldPositionOutOfMapText
+
+	case TinyErrAllFieldsTaken:
+		return TinyErrAllFieldsTakenText
+	case TinyErrNotYourMovementOrder:
+		return TinyErrNotYourMovementOrderText
+
+	default:
+		return "<nil>"
+	}
 }

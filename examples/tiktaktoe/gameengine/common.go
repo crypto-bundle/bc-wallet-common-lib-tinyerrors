@@ -40,11 +40,21 @@ import (
 	"github.com/google/uuid"
 )
 
-type gameStore interface {
+type matchDataStoreService interface {
 	AddMatchInfo(_ context.Context, info *models.BattleField) error
 	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
 	GetAllMatches(_ context.Context) []*models.BattleField
 
 	AddMatchMovement(_ context.Context, movement *models.Movement) error
 	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
+	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
+}
+
+type tikTakToeFieldService interface {
+	SetMove(posX, posY uint8, symbol int) (int, error)
+}
+
+type matchRolesManager interface {
+	GePlayerUUIDBySymbol(symbol int) uuid.UUID
+	GetSymbolByPlayerUUID(playerUUID uuid.UUID) int
 }

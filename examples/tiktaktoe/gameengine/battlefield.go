@@ -33,31 +33,78 @@
 package gameengine
 
 import (
+	"context"
+
 	"tiktaktoe/models"
+	"tiktaktoe/types"
+
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 
 	"github.com/google/uuid"
 )
 
 type battleFieldWorker struct {
 	matchUUID uuid.UUID
-	roles     map[uuid.UUID]bool
 
-	fields [][]bool
+	roles                   matchRolesManager
+	fields                  tikTakToeFieldService
+	battleFieldStoreDataSvc matchDataStoreService
 
-	battleFieldData *models.BattleField
-	movementHistory []*models.Movement
+	nextPlayer int
 }
 
-func (w *battleFieldWorker) SetMovement(playerUUID uuid.UUID, position [2]uint8) error {
+func (w *battleFieldWorker) WhoIsNext(_ context.Context) uuid.UUID {
+	return w.roles.GePlayerUUIDBySymbol(w.nextPlayer)
+}
+
+func (w *battleFieldWorker) SetMovement(ctx context.Context,
+	playerUUID uuid.UUID,
+	position [2]uint8,
+) (*types.MatchResult, error) {
+	playerSymbol := w.roles.GetSymbolByPlayerUUID(playerUUID)
+	if playerSymbol != w.nextPlayer {
+		return nil, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrNotYourMovementOrder)
+	}
+
 	x, y := position[0], position[1]
 
-	w.fields[x][y] = w.roles[playerUUID]
+	winner, err := w.fields.SetMove(x, y, playerSymbol)
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
 
-	w.movementHistory = append(w.movementHistory, &models.Movement{
+	err = w.battleFieldStoreDataSvc.AddMatchMovement(ctx, &models.Movement{
 		PlayerUUID:      playerUUID,
-		Position:        [2]uint8{x, y},
+		Position:        position,
 		BattleFieldUUID: w.matchUUID,
 	})
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
 
-	return nil
+	movementsCount, err := w.battleFieldStoreDataSvc.GetMatchMovementsCount(ctx, w.matchUUID)
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
+
+	if winner > 0 { // match is over. return match result
+		return &types.MatchResult{
+			MatchUUID:     w.matchUUID,
+			WinnerUUID:    w.roles.GePlayerUUIDBySymbol(winner),
+			WinnerSign:    winner,
+			MovementCount: uint(movementsCount),
+		}, nil
+	}
+
+	// match still in progress, set who's next
+	if movementsCount%2 == 0 { // first move of "X". "X" equal to 1 symbol
+		w.nextPlayer = 1
+
+		return nil, nil
+	}
+
+	// second move of "O". "O" equal to 0 symbol
+	w.nextPlayer = 1
+
+	return nil, nil
 }

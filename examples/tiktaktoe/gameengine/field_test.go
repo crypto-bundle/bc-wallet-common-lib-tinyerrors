@@ -39,11 +39,14 @@ func Test(t *testing.T) {
 
 	t.Logf("battleField size %d", len(battleFields.fields))
 
-	battleFields.SetMove(0, 0, 1)
-	battleFields.SetMove(1, 0, 1)
-	battleFields.SetMove(2, 0, 1)
-	battleFields.SetMove(3, 0, 1)
-	isWin := battleFields.SetMove(4, 0, 1)
+	_, _ = battleFields.SetMove(0, 0, 1)
+	_, _ = battleFields.SetMove(1, 0, 1)
+	_, _ = battleFields.SetMove(2, 0, 1)
+	_, _ = battleFields.SetMove(3, 0, 1)
+	isWin, err := battleFields.SetMove(4, 0, 1)
+	if err != nil {
+		t.Fatalf("some error happens %e", err)
+	}
 
 	t.Logf("isWin %v", isWin)
 }
@@ -53,9 +56,9 @@ func Test2(t *testing.T) {
 
 	t.Logf("battleField size %d", len(battleFields.fields))
 
-	battleFields.SetMove(0, 0, 1)
-	battleFields.SetMove(0, 1, 1)
-	isWin := battleFields.SetMove(0, 2, 1)
+	_, _ = battleFields.SetMove(0, 0, 1)
+	_, _ = battleFields.SetMove(0, 1, 1)
+	isWin, _ := battleFields.SetMove(0, 2, 1)
 
 	t.Logf("isWin %v", isWin)
 }
@@ -65,9 +68,9 @@ func Test3(t *testing.T) {
 
 	t.Logf("battleField size %d", len(battleFields.fields))
 
-	battleFields.SetMove(0, 0, 1)
-	battleFields.SetMove(1, 1, 1)
-	isWin := battleFields.SetMove(2, 2, 1)
+	_, _ = battleFields.SetMove(0, 0, 1)
+	_, _ = battleFields.SetMove(1, 1, 1)
+	isWin, _ := battleFields.SetMove(2, 2, 1)
 
 	t.Logf("isWin %v", isWin)
 }
@@ -77,9 +80,9 @@ func Test4(t *testing.T) {
 
 	t.Logf("battleField size %d", len(battleFields.fields))
 
-	battleFields.SetMove(0, 2, 1)
-	battleFields.SetMove(1, 1, 1)
-	isWin := battleFields.SetMove(2, 0, 1)
+	_, _ = battleFields.SetMove(0, 2, 1)
+	_, _ = battleFields.SetMove(1, 1, 1)
+	isWin, _ := battleFields.SetMove(2, 0, 1)
 
 	t.Logf("isWin %v", isWin)
 }

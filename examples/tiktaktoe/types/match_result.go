@@ -32,61 +32,13 @@
 
 package types
 
-import (
-	"strconv"
-)
+import "github.com/google/uuid"
 
-type TinyErrStatusCode int
+type MatchResult struct {
+	MatchUUID uuid.UUID
 
-const (
-	TinyErrCodeMatchAlreadyRegistered TinyErrStatusCode = iota + 7001
-	TinyErrCodeMatchNotRegistered
-	TinyErrCodeHasNoWinner
-	TinyErrFieldAlreadyTaken
-	TinyErrFieldPositionOutOfMap
-	TinyErrAllFieldsTaken
+	WinnerUUID uuid.UUID
+	WinnerSign int
 
-	TinyErrCodeMatchAlreadyRegisteredText = "match_already_registered"
-	TinyErrCodeMatchNotRegisteredText     = "match_not_found"
-	TinyErrCodeHasNoWinnerText            = "has_no_winner_in_game"
-	TinyErrFieldAlreadyTakenText          = "field_already_taken"
-	TinyErrFieldPositionOutOfMapText      = "field_position_out_map"
-	TinyErrAllFieldsTakenText             = "all_field_taken_math_is_over"
-)
-
-func (c TinyErrStatusCode) Itoa() string {
-	return strconv.Itoa(c.Int())
-}
-
-func (c TinyErrStatusCode) Int() int {
-	return int(c)
-}
-
-func (c TinyErrStatusCode) I18n() string {
-	return c.String()
-}
-
-func (c TinyErrStatusCode) String() string {
-	switch c {
-	case TinyErrCodeMatchAlreadyRegistered:
-		return TinyErrCodeMatchAlreadyRegisteredText
-
-	case TinyErrCodeMatchNotRegistered:
-		return TinyErrCodeMatchNotRegisteredText
-
-	case TinyErrCodeHasNoWinner:
-		return TinyErrCodeHasNoWinnerText
-
-	case TinyErrFieldAlreadyTaken:
-		return TinyErrFieldAlreadyTakenText
-
-	case TinyErrFieldPositionOutOfMap:
-		return TinyErrFieldPositionOutOfMapText
-
-	case TinyErrAllFieldsTaken:
-		return TinyErrAllFieldsTakenText
-
-	default:
-		return "<nil>"
-	}
+	MovementCount uint
 }

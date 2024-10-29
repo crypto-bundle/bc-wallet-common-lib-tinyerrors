@@ -30,42 +30,19 @@
  *
  */
 
-package grpcserver
+package gameengine
 
-import (
-	"tiktaktoe/app"
-	pb "tiktaktoe/pkg"
-	"tiktaktoe/types"
+import "github.com/google/uuid"
 
-	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
-
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-)
-
-func (m *marshaller) marshallNewGameError(err error) error {
-	// example of extract error status code from error via tinyerrors.ErrorGetCode function
-	switch tinyerrors.ErrorGetCode(err) {
-	case types.TinyErrCodeMatchAlreadyRegistered:
-		return m.marshalNewGameErrorAlreadyRegistered(err)
-
-	default:
-		return status.Error(codes.Internal, err.Error())
-	}
+type roles struct {
+	symbolByPlayer map[uuid.UUID]int
+	playerBySymbol map[int]uuid.UUID
 }
 
-func (m *marshaller) marshalNewGameErrorAlreadyRegistered(err error) error {
-	respErrStatus, _ := status.New(codes.PermissionDenied, "Match already exists").
-		WithDetails(&errdetails.ErrorInfo{
-			Reason: pb.ErrorReasons_MATCH_ALREADY_EXISTS.String(),
-			Domain: app.Domain,
-			Metadata: map[string]string{
-				"internal_error_status_code": types.TinyErrCodeMatchAlreadyRegistered.Itoa(),
-				"internal_error_status_text": types.TinyErrCodeMatchAlreadyRegistered.String(),
-				"error_message":              err.Error(),
-			},
-		})
+func (r *roles) GePlayerUUIDBySymbol(symbol int) uuid.UUID {
+	return r.playerBySymbol[symbol]
+}
 
-	return respErrStatus.Err()
+func (r *roles) GetSymbolByPlayerUUID(playerUUID uuid.UUID) int {
+	return r.symbolByPlayer[playerUUID]
 }
