@@ -42,3 +42,9 @@ type MatchResult struct {
 
 	MovementCount uint
 }
+
+func (mr *MatchResult) Clone() *MatchResult {
+	data := *mr
+
+	return &data
+}

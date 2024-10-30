@@ -32,36 +32,10 @@
 
 package gameengine
 
-import (
-	"context"
+import "errors"
 
-	"tiktaktoe/models"
-	"tiktaktoe/types"
-
-	"github.com/google/uuid"
+var (
+	ErrHasNoWinnerInMatch = errors.New("has no winner in battlefield")
+	ErrSetMove            = errors.New("unable to set player move")
+	ErrMatchWrongStatus   = errors.New("wrong match status")
 )
-
-type matchDataStoreService interface {
-	AddMatchInfo(_ context.Context, info *models.BattleField) error
-	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
-	UpdateMatchStatus(_ context.Context,
-		matchUUID uuid.UUID,
-		newStatus types.MatchProgressStatus,
-	) error
-	GetAllMatches(_ context.Context) []*models.BattleField
-
-	AddMatchMovement(_ context.Context, movement *models.Movement) error
-	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
-	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
-
-	AddMatchResult(ctx context.Context, result *models.MatchResult) error
-}
-
-type tikTakToeFieldService interface {
-	SetMove(posX, posY uint8, symbol int) (int, error)
-}
-
-type matchRolesManager interface {
-	GePlayerUUIDBySymbol(symbol int) uuid.UUID
-	GetSymbolByPlayerUUID(playerUUID uuid.UUID) int
-}

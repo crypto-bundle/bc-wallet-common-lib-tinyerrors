@@ -52,6 +52,7 @@ type store struct {
 	mu sync.Mutex
 
 	matchMap     map[uuid.UUID]models.BattleField
+	matchResults map[uuid.UUID]models.MatchResult
 	movementsMap map[uuid.UUID][]models.Movement
 }
 
@@ -94,6 +95,24 @@ func (s *store) AddMatchInfo(_ context.Context, info models.BattleField) error {
 	return nil
 }
 
+func (s *store) UpdateMatchStatus(_ context.Context,
+	matchUUID uuid.UUID,
+	newStatus types.MatchProgressStatus,
+) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	matchInfo, isExists := s.matchMap[matchUUID]
+	if isExists {
+		return tinyerrors.ErrorWithCode(ErrMatchInfoAlreadyExist,
+			types.TinyErrCodeMatchAlreadyRegistered)
+	}
+
+	matchInfo.Status = newStatus
+
+	return nil
+}
+
 func (s *store) AddMatchMovement(_ context.Context, movement models.Movement) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -130,6 +149,9 @@ func (s *store) GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]m
 }
 
 func (s *store) GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	_, isExists := s.matchMap[matchUUID]
 	if !isExists {
 		return 0, tinyerrors.ErrorWithCode(ErrMatchInfoAlreadyExist,
@@ -139,4 +161,19 @@ func (s *store) GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (
 	movementsList := s.movementsMap[matchUUID]
 
 	return len(movementsList), nil
+}
+
+func (s *store) AddMatchResult(_ context.Context, matchResultData *models.MatchResult) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	matchInfo, isExists := s.matchMap[matchResultData.MatchUUID]
+	if !isExists {
+		return tinyerrors.ErrorWithCode(ErrMatchInfoAlreadyExist,
+			types.TinyErrCodeMatchNotRegistered)
+	}
+
+	s.matchResults[matchInfo.UUID] = *matchResultData.Clone()
+
+	return nil
 }

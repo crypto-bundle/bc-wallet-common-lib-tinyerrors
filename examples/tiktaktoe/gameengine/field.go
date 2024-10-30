@@ -33,8 +33,6 @@
 package gameengine
 
 import (
-	"errors"
-
 	"tiktaktoe/types"
 
 	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
@@ -43,11 +41,6 @@ import (
 const (
 	fieldDefaultValue = -1
 	noWinnerResult    = -1
-)
-
-var (
-	ErrHasNoWinnerInMatch = errors.New("has no winner in battlefield")
-	ErrSetMove            = errors.New("unable to set player move")
 )
 
 type fields struct {

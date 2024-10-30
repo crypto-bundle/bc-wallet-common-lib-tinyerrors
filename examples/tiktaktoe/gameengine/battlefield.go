@@ -62,6 +62,17 @@ func (w *battleFieldWorker) WhoIsNext(_ context.Context) uuid.UUID {
 	return w.roles.GePlayerUUIDBySymbol(w.nextPlayer)
 }
 
+func (w *battleFieldWorker) StopMatch(ctx context.Context) error {
+	err := w.battleFieldStoreDataSvc.UpdateMatchStatus(ctx, w.matchUUID, types.MatchStopped)
+	if err != nil {
+		return tinyerrors.ErrorNoWrap(err)
+	}
+
+	w.nextPlayer = -1
+
+	return nil
+}
+
 func (w *battleFieldWorker) SetMovement(ctx context.Context,
 	playerUUID uuid.UUID,
 	position [2]uint8,

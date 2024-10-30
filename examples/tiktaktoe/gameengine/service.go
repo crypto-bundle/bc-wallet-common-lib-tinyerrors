@@ -81,3 +81,19 @@ func (s *service) StartNewGame(ctx context.Context,
 
 	return bfData, nil
 }
+
+func (s *service) StopGame(ctx context.Context,
+	matchUUID uuid.UUID,
+) error {
+	bf, isExists := s.battleFields[matchUUID]
+	if !isExists {
+		return tinyerrors.ErrWithCode(ErrMatchWrongStatus, types.TinyErrCodeMatchNotRegistered)
+	}
+
+	err := bf.StopMatch(ctx)
+	if err != nil {
+		return tinyerrors.ErrorNoWrap(err)
+	}
+
+	return nil
+}

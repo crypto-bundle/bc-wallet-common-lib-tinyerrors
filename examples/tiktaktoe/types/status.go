@@ -36,9 +36,11 @@ type MatchProgressStatus uint8
 
 const (
 	MatchStillInProgress MatchProgressStatus = iota + 1
+	MatchStopped
 	MatchAlreadyEnded
 
 	MatchStillInProgressText = "match_still_in_progress"
+	MatchStoppedText         = "match_is_stopped"
 	MatchAlreadyEndedText    = "match_already_end"
 )
 
