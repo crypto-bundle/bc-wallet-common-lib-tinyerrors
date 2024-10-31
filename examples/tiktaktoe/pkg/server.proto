@@ -34,20 +34,30 @@ message MatchInfo {
   MatchStatus MatchStatus = 2;
 }
 
+message JoinToLobbyRequest {
+  string UserUUID = 1;
+}
+
+message JoinToLobbyResponse {
+  string UserUUID = 1;
+  string TokenUUID = 2;
+}
+
 message StartMatchRequest {
   uint32 BattleFieldSize = 1;
 }
 
 message StartMatchResponse {
   string MatchUUID = 1;
-  bytes SignedData = 2;
+  uint32 BattleFieldSize = 2;
+  MatchStatus MatchStatus = 3;
 }
 
-message MakeMoveRequest {
+message PlayerMoveRequest {
   string MatchUUID = 1;
 }
 
-message MakeMoveResponse {
+message PlayerMoveResponse {
   string MatchUUID = 1;
   MatchStatus MatchStatus = 2;
 }
@@ -78,9 +88,10 @@ message MathListResponse {
 }
 
 service GameApi {
+  rpc JoinToLobby                 (JoinToLobbyRequest)               returns (JoinToLobbyResponse) {}
   rpc StartMatch                    (StartMatchRequest)                returns (StartMatchResponse) {}
   rpc StopMatch                     (StartMatchRequest)                returns (StartMatchResponse) {}
-  rpc MakeMove                      (MakeMoveRequest)                  returns (MakeMoveResponse) {}
+  rpc PlayerMove                      (PlayerMoveRequest)                  returns (PlayerMoveResponse) {}
   rpc GetMathStatus                    (MatchStatusRequest)               returns (MatchStatusResponse) {}
   rpc GetMathList                      (MathListRequest)                  returns (MathListResponse) {}
 }

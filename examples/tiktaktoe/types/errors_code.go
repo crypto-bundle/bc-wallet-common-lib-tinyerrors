@@ -47,6 +47,8 @@ const (
 	TinyErrAllFieldsTaken
 	TinyErrNotYourMovementOrder
 	TinyErrorUnableToCreateBattlefield
+	TinyErrorAccessTokensNotFound
+	TinyErrorAccessAlreadyExists
 
 	TinyErrCodeMatchAlreadyRegisteredText  = "match_already_registered"
 	TinyErrCodeMatchNotRegisteredText      = "match_not_found"
@@ -56,6 +58,8 @@ const (
 	TinyErrAllFieldsTakenText              = "all_field_taken_math_is_over"
 	TinyErrNotYourMovementOrderText        = "not_your_movement_order"
 	TinyErrorUnableToCreateBattlefieldText = "unable_to_create_battlefield"
+	TinyErrorAccessTokensNotFoundText      = "access_tokens_not_found"
+	TinyErrorAccessAlreadyExistsText       = "access_tokens_already_exists"
 )
 
 func (c TinyErrStatusCode) Itoa() string {
@@ -93,6 +97,10 @@ func (c TinyErrStatusCode) String() string {
 		return TinyErrNotYourMovementOrderText
 	case TinyErrorUnableToCreateBattlefield:
 		return TinyErrorUnableToCreateBattlefieldText
+	case TinyErrorAccessTokensNotFound:
+		return TinyErrorAccessTokensNotFoundText
+	case TinyErrorAccessAlreadyExists:
+		return TinyErrorAccessAlreadyExistsText
 
 	default:
 		return "<nil>"

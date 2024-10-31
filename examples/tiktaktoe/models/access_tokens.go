@@ -30,6 +30,17 @@
  *
  */
 
-package grpcserver
+package models
 
-type marshaller struct{}
+import "github.com/google/uuid"
+
+type AccessTokensPair struct {
+	PairUUID     uuid.UUID
+	AccessTokens [2]uuid.UUID
+}
+
+func (ac *AccessTokensPair) Clone() *AccessTokensPair {
+	data := *ac
+
+	return &data
+}

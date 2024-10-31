@@ -34,6 +34,7 @@ package grpcserver
 
 import (
 	"tiktaktoe/app"
+	"tiktaktoe/models"
 	pb "tiktaktoe/pkg"
 	"tiktaktoe/types"
 
@@ -44,7 +45,22 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (m *marshaller) marshallNewGameError(err error) error {
+type newGameMarshaller struct {
+}
+
+func (m *newGameMarshaller) marshallNewGame(dataModel *models.BattleField) *pb.StartMatchResponse {
+	return &pb.StartMatchResponse{
+		MatchUUID:       dataModel.UUID.String(),
+		BattleFieldSize: uint32(dataModel.Size),
+		MatchStatus: &pb.MatchStatus{
+			ProgressStatus: pb.MatchProgressStatus_MATCH_STILL_IN_PROGRESS,
+			MovementStatus: pb.CurrentMovementStatus_AWAIT_FOR_X_MOVE,
+			NextMove:       pb.NextMovementStatus_NEXT_MOVE_O,
+		},
+	}
+}
+
+func (m *newGameMarshaller) marshallNewGameError(err error) error {
 	// example of extract error status code from error via tinyerrors.ErrorGetCode function
 	switch tinyerrors.ErrorGetCode(err) {
 	case types.TinyErrCodeMatchAlreadyRegistered:
@@ -55,7 +71,7 @@ func (m *marshaller) marshallNewGameError(err error) error {
 	}
 }
 
-func (m *marshaller) marshalNewGameErrorAlreadyRegistered(err error) error {
+func (m *newGameMarshaller) marshalNewGameErrorAlreadyRegistered(err error) error {
 	respErrStatus, _ := status.New(codes.PermissionDenied, "Match already exists").
 		WithDetails(&errdetails.ErrorInfo{
 			Reason: pb.ErrorReasons_MATCH_ALREADY_EXISTS.String(),

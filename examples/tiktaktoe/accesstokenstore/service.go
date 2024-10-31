@@ -30,43 +30,54 @@
  *
  */
 
-package gameengine
+package accesstokenstore
 
 import (
 	"context"
+	"errors"
+	"sync"
 
 	"tiktaktoe/models"
 	"tiktaktoe/types"
 
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+
 	"github.com/google/uuid"
 )
 
-type accessTokenStorageService interface {
-	GetTokensByPairUUID(_ context.Context, pairUUID uuid.UUID) (*models.AccessTokensPair, error)
-	AddTokens(_ context.Context, tokensData *models.AccessTokensPair) error
+var (
+	ErrTokensNotFound      = errors.New("access tokens not found")
+	ErrTokensAlreadyExists = errors.New("access tokens already exists")
+)
+
+type store struct {
+	mu sync.Mutex
+
+	tokensMap map[uuid.UUID]models.AccessTokensPair
 }
 
-type matchDataStoreService interface {
-	AddMatchInfo(_ context.Context, info *models.BattleField) error
-	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
-	UpdateMatchStatus(_ context.Context,
-		matchUUID uuid.UUID,
-		newStatus types.MatchProgressStatus,
-	) error
-	GetAllMatches(_ context.Context) []*models.BattleField
+func (s *store) GetTokensByMatchUUID(_ context.Context, matchUUID uuid.UUID) (*models.AccessTokensPair, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	AddMatchMovement(_ context.Context, movement *models.Movement) error
-	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
-	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
+	tokensData, isExists := s.tokensMap[matchUUID]
+	if !isExists {
+		return nil, tinyerrors.ErrWithCode(ErrTokensNotFound, types.TinyErrorAccessTokensNotFound)
+	}
 
-	AddMatchResult(ctx context.Context, result *models.MatchResult) error
+	return tokensData.Clone(), nil
 }
 
-type tikTakToeFieldService interface {
-	SetMove(posX, posY uint8, symbol int) (int, error)
-}
+func (s *store) AddTokens(_ context.Context, tokensData *models.AccessTokensPair) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-type matchRolesManager interface {
-	GePlayerUUIDBySymbol(symbol int) uuid.UUID
-	GetSymbolByPlayerUUID(playerUUID uuid.UUID) int
+	_, isExists := s.tokensMap[tokensData.MatchUUID]
+	if isExists {
+		return tinyerrors.ErrWithCode(ErrTokensAlreadyExists, types.TinyErrorAccessTokensNotFound)
+	}
+
+	s.tokensMap[tokensData.MatchUUID] = *tokensData.Clone()
+
+	return nil
 }

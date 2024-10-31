@@ -18,9 +18,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameApiClient interface {
+	JoinToLobby(ctx context.Context, in *JoinToLobbyRequest, opts ...grpc.CallOption) (*JoinToLobbyResponse, error)
 	StartMatch(ctx context.Context, in *StartMatchRequest, opts ...grpc.CallOption) (*StartMatchResponse, error)
 	StopMatch(ctx context.Context, in *StartMatchRequest, opts ...grpc.CallOption) (*StartMatchResponse, error)
-	MakeMove(ctx context.Context, in *MakeMoveRequest, opts ...grpc.CallOption) (*MakeMoveResponse, error)
+	PlayerMove(ctx context.Context, in *PlayerMoveRequest, opts ...grpc.CallOption) (*PlayerMoveResponse, error)
 	GetMathStatus(ctx context.Context, in *MatchStatusRequest, opts ...grpc.CallOption) (*MatchStatusResponse, error)
 	GetMathList(ctx context.Context, in *MathListRequest, opts ...grpc.CallOption) (*MathListResponse, error)
 }
@@ -31,6 +32,15 @@ type gameApiClient struct {
 
 func NewGameApiClient(cc grpc.ClientConnInterface) GameApiClient {
 	return &gameApiClient{cc}
+}
+
+func (c *gameApiClient) JoinToLobby(ctx context.Context, in *JoinToLobbyRequest, opts ...grpc.CallOption) (*JoinToLobbyResponse, error) {
+	out := new(JoinToLobbyResponse)
+	err := c.cc.Invoke(ctx, "/pb.GameApi/JoinToLobby", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gameApiClient) StartMatch(ctx context.Context, in *StartMatchRequest, opts ...grpc.CallOption) (*StartMatchResponse, error) {
@@ -51,9 +61,9 @@ func (c *gameApiClient) StopMatch(ctx context.Context, in *StartMatchRequest, op
 	return out, nil
 }
 
-func (c *gameApiClient) MakeMove(ctx context.Context, in *MakeMoveRequest, opts ...grpc.CallOption) (*MakeMoveResponse, error) {
-	out := new(MakeMoveResponse)
-	err := c.cc.Invoke(ctx, "/pb.GameApi/MakeMove", in, out, opts...)
+func (c *gameApiClient) PlayerMove(ctx context.Context, in *PlayerMoveRequest, opts ...grpc.CallOption) (*PlayerMoveResponse, error) {
+	out := new(PlayerMoveResponse)
+	err := c.cc.Invoke(ctx, "/pb.GameApi/PlayerMove", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +92,10 @@ func (c *gameApiClient) GetMathList(ctx context.Context, in *MathListRequest, op
 // All implementations must embed UnimplementedGameApiServer
 // for forward compatibility
 type GameApiServer interface {
+	JoinToLobby(context.Context, *JoinToLobbyRequest) (*JoinToLobbyResponse, error)
 	StartMatch(context.Context, *StartMatchRequest) (*StartMatchResponse, error)
 	StopMatch(context.Context, *StartMatchRequest) (*StartMatchResponse, error)
-	MakeMove(context.Context, *MakeMoveRequest) (*MakeMoveResponse, error)
+	PlayerMove(context.Context, *PlayerMoveRequest) (*PlayerMoveResponse, error)
 	GetMathStatus(context.Context, *MatchStatusRequest) (*MatchStatusResponse, error)
 	GetMathList(context.Context, *MathListRequest) (*MathListResponse, error)
 	mustEmbedUnimplementedGameApiServer()
@@ -94,14 +105,17 @@ type GameApiServer interface {
 type UnimplementedGameApiServer struct {
 }
 
+func (UnimplementedGameApiServer) JoinToLobby(context.Context, *JoinToLobbyRequest) (*JoinToLobbyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JoinToLobby not implemented")
+}
 func (UnimplementedGameApiServer) StartMatch(context.Context, *StartMatchRequest) (*StartMatchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartMatch not implemented")
 }
 func (UnimplementedGameApiServer) StopMatch(context.Context, *StartMatchRequest) (*StartMatchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StopMatch not implemented")
 }
-func (UnimplementedGameApiServer) MakeMove(context.Context, *MakeMoveRequest) (*MakeMoveResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MakeMove not implemented")
+func (UnimplementedGameApiServer) PlayerMove(context.Context, *PlayerMoveRequest) (*PlayerMoveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlayerMove not implemented")
 }
 func (UnimplementedGameApiServer) GetMathStatus(context.Context, *MatchStatusRequest) (*MatchStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMathStatus not implemented")
@@ -120,6 +134,24 @@ type UnsafeGameApiServer interface {
 
 func RegisterGameApiServer(s grpc.ServiceRegistrar, srv GameApiServer) {
 	s.RegisterService(&GameApi_ServiceDesc, srv)
+}
+
+func _GameApi_JoinToLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinToLobbyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameApiServer).JoinToLobby(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.GameApi/JoinToLobby",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameApiServer).JoinToLobby(ctx, req.(*JoinToLobbyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _GameApi_StartMatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -158,20 +190,20 @@ func _GameApi_StopMatch_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GameApi_MakeMove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MakeMoveRequest)
+func _GameApi_PlayerMove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayerMoveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameApiServer).MakeMove(ctx, in)
+		return srv.(GameApiServer).PlayerMove(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.GameApi/MakeMove",
+		FullMethod: "/pb.GameApi/PlayerMove",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameApiServer).MakeMove(ctx, req.(*MakeMoveRequest))
+		return srv.(GameApiServer).PlayerMove(ctx, req.(*PlayerMoveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -220,6 +252,10 @@ var GameApi_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GameApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "JoinToLobby",
+			Handler:    _GameApi_JoinToLobby_Handler,
+		},
+		{
 			MethodName: "StartMatch",
 			Handler:    _GameApi_StartMatch_Handler,
 		},
@@ -228,8 +264,8 @@ var GameApi_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameApi_StopMatch_Handler,
 		},
 		{
-			MethodName: "MakeMove",
-			Handler:    _GameApi_MakeMove_Handler,
+			MethodName: "PlayerMove",
+			Handler:    _GameApi_PlayerMove_Handler,
 		},
 		{
 			MethodName: "GetMathStatus",

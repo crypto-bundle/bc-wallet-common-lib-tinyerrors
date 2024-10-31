@@ -31,3 +31,23 @@
  */
 
 package grpcserver
+
+import (
+	"context"
+
+	pb "tiktaktoe/pkg"
+)
+
+type newGameHandler struct {
+	marshallerSvc marshallerNewGameService
+	gameEngineSvc gameEngineService
+}
+
+func (h *newGameHandler) Handle(ctx context.Context, req *pb.StartMatchRequest) (*pb.StartMatchResponse, error) {
+	bf, err := h.gameEngineSvc.StartNewGame(ctx)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallNewGameError(err)
+	}
+
+	return h.marshallerSvc.marshallNewGame(bf), nil
+}

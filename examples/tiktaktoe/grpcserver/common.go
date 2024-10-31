@@ -30,43 +30,56 @@
  *
  */
 
-package gameengine
+package grpcserver
 
 import (
 	"context"
-
-	"tiktaktoe/models"
-	"tiktaktoe/types"
-
 	"github.com/google/uuid"
+	"tiktaktoe/models"
+	pb "tiktaktoe/pkg"
 )
 
-type accessTokenStorageService interface {
-	GetTokensByPairUUID(_ context.Context, pairUUID uuid.UUID) (*models.AccessTokensPair, error)
-	AddTokens(_ context.Context, tokensData *models.AccessTokensPair) error
+type marshallerJoinToLobbyService interface {
+	marshallJoinToLobbyResponse(dataModel *models.BattleField) *pb.JoinToLobbyResponse
+	marshallJoinToLobbyError(err error) error
 }
 
-type matchDataStoreService interface {
-	AddMatchInfo(_ context.Context, info *models.BattleField) error
-	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
-	UpdateMatchStatus(_ context.Context,
+type marshallerNewGameService interface {
+	marshallNewGameResponse(dataModel *models.BattleField) *pb.StartMatchResponse
+	marshallNewGameError(err error) error
+}
+
+type gameEngineService interface {
+	StartNewGame(ctx context.Context,
+		playerOneUUID,
+		playerTwoUUID uuid.UUID,
+		fieldSize uint,
+	) (*models.BattleField, error)
+	StopGame(ctx context.Context,
 		matchUUID uuid.UUID,
-		newStatus types.MatchProgressStatus,
 	) error
-	GetAllMatches(_ context.Context) []*models.BattleField
-
-	AddMatchMovement(_ context.Context, movement *models.Movement) error
-	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
-	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
-
-	AddMatchResult(ctx context.Context, result *models.MatchResult) error
 }
 
-type tikTakToeFieldService interface {
-	SetMove(posX, posY uint8, symbol int) (int, error)
+type joinToLobbyHandlerService interface {
+	Handle(ctx context.Context, req *pb.JoinToLobbyRequest) (*pb.JoinToLobbyResponse, error)
 }
 
-type matchRolesManager interface {
-	GePlayerUUIDBySymbol(symbol int) uuid.UUID
-	GetSymbolByPlayerUUID(playerUUID uuid.UUID) int
+type newGameHandlerService interface {
+	Handle(ctx context.Context, req *pb.StartMatchRequest) (*pb.StartMatchResponse, error)
+}
+
+type stopGameHandlerService interface {
+	Handle(ctx context.Context, request *pb.StopMatchRequest) (*pb.StopMatchResponse, error)
+}
+
+type playerMoveHandlerService interface {
+	Handle(ctx context.Context, request *pb.PlayerMoveRequest) (*pb.PlayerMoveResponse, error)
+}
+
+type getMatchStatusHandlerService interface {
+	Handle(ctx context.Context, request *pb.MatchStatusRequest) (*pb.MatchStatusResponse, error)
+}
+
+type getMatchListHandlerService interface {
+	Handle(ctx context.Context, request *pb.MathListRequest) (*pb.MathListResponse, error)
 }

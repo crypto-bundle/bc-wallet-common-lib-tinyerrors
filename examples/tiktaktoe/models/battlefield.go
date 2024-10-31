@@ -38,10 +38,11 @@ import (
 )
 
 type BattleField struct {
-	Players [2]uuid.UUID
-	Size    uint8
-	Status  types.MatchProgressStatus
-	UUID    uuid.UUID
+	Players        [2]uuid.UUID
+	Size           uint8
+	Status         types.MatchProgressStatus
+	UUID           uuid.UUID
+	TokensPairUUID uuid.UUID
 }
 
 func (bf *BattleField) Clone() *BattleField {

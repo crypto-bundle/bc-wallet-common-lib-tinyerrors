@@ -30,43 +30,54 @@
  *
  */
 
-package gameengine
+package grpcserver
 
 import (
 	"context"
 
-	"tiktaktoe/models"
-	"tiktaktoe/types"
-
-	"github.com/google/uuid"
+	pb "tiktaktoe/pkg"
 )
 
-type accessTokenStorageService interface {
-	GetTokensByPairUUID(_ context.Context, pairUUID uuid.UUID) (*models.AccessTokensPair, error)
-	AddTokens(_ context.Context, tokensData *models.AccessTokensPair) error
+type grpcService struct {
+	pb.UnimplementedGameApiServer
+
+	gameEngineSvc gameEngineService
+
+	joinToLobbyHandlerSvc    joinToLobbyHandlerService
+	newGameHandlerSvc        newGameHandlerService
+	stopGameHandlerSvc       stopGameHandlerService
+	playerMoveHandlerSvc     playerMoveHandlerService
+	getMatchStatusHandlerSvc getMatchStatusHandlerService
+	getMatchListHandlerSvc   getMatchListHandlerService
 }
 
-type matchDataStoreService interface {
-	AddMatchInfo(_ context.Context, info *models.BattleField) error
-	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
-	UpdateMatchStatus(_ context.Context,
-		matchUUID uuid.UUID,
-		newStatus types.MatchProgressStatus,
-	) error
-	GetAllMatches(_ context.Context) []*models.BattleField
-
-	AddMatchMovement(_ context.Context, movement *models.Movement) error
-	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
-	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
-
-	AddMatchResult(ctx context.Context, result *models.MatchResult) error
+func (h *grpcService) JoinToLobby(ctx context.Context, req *pb.JoinToLobbyRequest) (*pb.JoinToLobbyResponse, error) {
+	return h.joinToLobbyHandlerSvc.Handle(ctx, req)
 }
 
-type tikTakToeFieldService interface {
-	SetMove(posX, posY uint8, symbol int) (int, error)
+func (h *grpcService) StartMatch(ctx context.Context, req *pb.StartMatchRequest) (*pb.StartMatchResponse, error) {
+	return h.newGameHandlerSvc.Handle(ctx, req)
 }
 
-type matchRolesManager interface {
-	GePlayerUUIDBySymbol(symbol int) uuid.UUID
-	GetSymbolByPlayerUUID(playerUUID uuid.UUID) int
+func (h *grpcService) StopMatch(ctx context.Context, req *pb.StopMatchRequest) (*pb.StopMatchResponse, error) {
+	return h.stopGameHandlerSvc.Handle(ctx, req)
+}
+
+func (h *grpcService) PlayerMove(ctx context.Context, req *pb.PlayerMoveRequest) (*pb.PlayerMoveResponse, error) {
+	return h.playerMoveHandlerSvc.Handle(ctx, req)
+}
+
+func (h *grpcService) GetMathStatus(ctx context.Context, req *pb.MatchStatusRequest) (*pb.MatchStatusResponse, error) {
+	return h.getMatchStatusHandlerSvc.Handle(ctx, req)
+}
+
+func (h *grpcService) GetMathList(ctx context.Context, req *pb.MathListRequest) (*pb.MathListResponse, error) {
+	return h.getMatchListHandlerSvc.Handle(ctx, req)
+}
+
+func NewGrpcService(gameEnginSvc gameEngineService) *grpcService {
+	return &grpcService{
+		UnimplementedGameApiServer: pb.UnimplementedGameApiServer{},
+		gameEngineSvc:              gameEnginSvc,
+	}
 }

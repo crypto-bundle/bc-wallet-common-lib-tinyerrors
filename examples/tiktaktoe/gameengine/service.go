@@ -47,6 +47,7 @@ type service struct {
 	battleFields map[uuid.UUID]*battleFieldWorker
 
 	battleFieldStoreDataSvc matchDataStoreService
+	accessTokensDataSvc     accessTokenStorageService
 }
 
 func (s *service) StartNewGame(ctx context.Context,
@@ -63,18 +64,45 @@ func (s *service) StartNewGame(ctx context.Context,
 		return nil, tinyerrors.ErrorNoWrap(err)
 	}
 
+	tokensPairUUID, err := uuid.NewV7()
+	if err != nil {
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+	}
+
+	xAccessTokenUUID, err := uuid.NewV7()
+	if err != nil {
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+	}
+
+	oAccessTokenUUID, err := uuid.NewV7()
+	if err != nil {
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+	}
+
 	s.mu.Lock()
 	s.battleFields[bf.GetMatchUUID()] = bf
 	s.mu.Unlock()
 
 	bfData := &models.BattleField{
-		Players: UUIDArr,
-		Size:    3,
-		Status:  types.MatchStillInProgress,
-		UUID:    bf.GetMatchUUID(),
+		Players:        UUIDArr,
+		Size:           3,
+		Status:         types.MatchStillInProgress,
+		UUID:           bf.GetMatchUUID(),
+		TokensPairUUID: tokensPairUUID,
 	}
 
 	err = s.battleFieldStoreDataSvc.AddMatchInfo(ctx, bfData)
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
+
+	err = s.accessTokensDataSvc.AddTokens(ctx, &models.AccessTokensPair{
+		PairUUID: tokensPairUUID,
+		AccessTokens: [2]uuid.UUID{
+			xAccessTokenUUID,
+			oAccessTokenUUID,
+		},
+	})
 	if err != nil {
 		return nil, tinyerrors.ErrorNoWrap(err)
 	}
