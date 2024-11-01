@@ -49,6 +49,7 @@ const (
 	TinyErrorUnableToCreateBattlefield
 	TinyErrorAccessTokensNotFound
 	TinyErrorAccessAlreadyExists
+	TinyErrorValidationFailed
 
 	TinyErrCodeMatchAlreadyRegisteredText  = "match_already_registered"
 	TinyErrCodeMatchNotRegisteredText      = "match_not_found"
@@ -60,6 +61,7 @@ const (
 	TinyErrorUnableToCreateBattlefieldText = "unable_to_create_battlefield"
 	TinyErrorAccessTokensNotFoundText      = "access_tokens_not_found"
 	TinyErrorAccessAlreadyExistsText       = "access_tokens_already_exists"
+	TinyErrorValidationFailedText          = "validation_error"
 )
 
 func (c TinyErrStatusCode) Itoa() string {
@@ -76,6 +78,8 @@ func (c TinyErrStatusCode) I18n() string {
 
 func (c TinyErrStatusCode) String() string {
 	switch c {
+	case TinyErrorValidationFailed:
+		return TinyErrorValidationFailedText
 	case TinyErrCodeMatchAlreadyRegistered:
 		return TinyErrCodeMatchAlreadyRegisteredText
 

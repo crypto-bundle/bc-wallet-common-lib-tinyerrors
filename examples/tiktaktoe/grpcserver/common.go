@@ -34,14 +34,25 @@ package grpcserver
 
 import (
 	"context"
-	"github.com/google/uuid"
+
 	"tiktaktoe/models"
 	pb "tiktaktoe/pkg"
+
+	"github.com/google/uuid"
 )
 
+type lobbyEngineService interface {
+	JoinToLobby(ctx context.Context, playerUUID uuid.UUID) (token *models.AccessToken, err error)
+}
+
 type marshallerJoinToLobbyService interface {
-	marshallJoinToLobbyResponse(dataModel *models.BattleField) *pb.JoinToLobbyResponse
+	marshallJoinToLobbyResponse(dataModel *models.AccessToken) *pb.JoinToLobbyResponse
 	marshallJoinToLobbyError(err error) error
+}
+
+type marshallerPlayerMoveService interface {
+	marshallPlayerMoveResponse(dataModel *models.MatchResult) *pb.PlayerMoveResponse
+	marshallPlayerMoveError(err error) error
 }
 
 type marshallerNewGameService interface {
@@ -55,6 +66,11 @@ type gameEngineService interface {
 		playerTwoUUID uuid.UUID,
 		fieldSize uint,
 	) (*models.BattleField, error)
+	SetPlayerMovement(ctx context.Context,
+		matchUUID uuid.UUID,
+		playerUUID uuid.UUID,
+		movementPosition [2]uint8,
+	) (*models.MatchResult, error)
 	StopGame(ctx context.Context,
 		matchUUID uuid.UUID,
 	) error

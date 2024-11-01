@@ -34,33 +34,43 @@ package grpcserver
 
 import (
 	"context"
-
+	validate "github.com/asaskevich/govalidator/v11"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+	"github.com/google/uuid"
 	pb "tiktaktoe/pkg"
+	"tiktaktoe/types"
 )
 
-type nextMoveHandler struct {
-	marshallerSvc marshallerPlayerMoveService
-	gameEngineSvc gameEngineService
+type nextMoveForm struct {
+	MatchUUID  uuid.UUID `valid:"uuid,required"`
+	PlayerUUID uuid.UUID `valid:"uuid,required"`
+	PositionX  uint8     `valid:"int,range(0|255),required"`
+	PositionY  uint8     `valid:"int,range(0|255),required"`
 }
 
-func (h *nextMoveHandler) Handle(ctx context.Context, req *pb.PlayerMoveRequest) (*pb.PlayerMoveResponse, error) {
-	vf := &nextMoveForm{}
-	valid, err := vf.LoadAndValidate(ctx, req)
+func (f *nextMoveForm) LoadAndValidate(_ context.Context,
+	req *pb.PlayerMoveRequest,
+) (valid bool, err error) {
+	matchUUID, err := uuid.Parse(req.MatchUUID)
 	if err != nil {
-		if !valid {
-			return nil, h.marshallerSvc.marshallPlayerMoveError(err)
-		}
-
-		return nil, h.marshallerSvc.marshallPlayerMoveError(err)
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
 	}
 
-	matchResult, err := h.gameEngineSvc.SetPlayerMovement(ctx, vf.MatchUUID, vf.PlayerUUID, [2]uint8{
-		vf.PositionX,
-		vf.PositionY,
-	})
+	f.MatchUUID = matchUUID
+
+	playerUUID, err := uuid.Parse(req.PlayerUUID)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallPlayerMoveError(err)
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
 	}
 
-	return h.marshallerSvc.marshallPlayerMoveResponse(matchResult), nil
+	f.PlayerUUID = playerUUID
+	f.PositionX = uint8(req.PositionX)
+	f.PositionY = uint8(req.PositionY)
+
+	_, err = validate.ValidateStruct(f)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
+
+	return true, nil
 }

@@ -31,3 +31,37 @@
  */
 
 package grpcserver
+
+import (
+	"context"
+
+	pb "tiktaktoe/pkg"
+	"tiktaktoe/types"
+
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+
+	validate "github.com/asaskevich/govalidator/v11"
+	"github.com/google/uuid"
+)
+
+type joinToLobbyForm struct {
+	PlayerUUID uuid.UUID `valid:"uuid,required"`
+}
+
+func (f *joinToLobbyForm) LoadAndValidate(_ context.Context,
+	req *pb.JoinToLobbyRequest,
+) (valid bool, err error) {
+	playerUUID, err := uuid.Parse(req.UserUUID)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
+
+	f.PlayerUUID = playerUUID
+
+	_, err = validate.ValidateStruct(f)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
+
+	return true, nil
+}

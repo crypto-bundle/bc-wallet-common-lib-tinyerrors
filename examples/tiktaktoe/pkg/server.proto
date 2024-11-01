@@ -55,11 +55,17 @@ message StartMatchResponse {
 
 message PlayerMoveRequest {
   string MatchUUID = 1;
+  string PlayerUUID = 2;
+  uint32 PositionX = 3;
+  uint32 PositionY = 4;
 }
 
 message PlayerMoveResponse {
   string MatchUUID = 1;
-  MatchStatus MatchStatus = 2;
+  string PlayerUUID = 2;
+  MatchStatus MatchStatus = 3;
+  uint32 PositionX = 4;
+  uint32 PositionY = 5;
 }
 
 message MatchStatusRequest {

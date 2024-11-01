@@ -34,19 +34,31 @@ package grpcserver
 
 import (
 	"context"
+
 	pb "tiktaktoe/pkg"
 )
 
 type joinLobbyHandler struct {
-	marshallerSvc marshallerJoinToLobbyService
-	gameEngineSvc gameEngineService
+	marshallerSvc  marshallerJoinToLobbyService
+	gameEngineSvc  gameEngineService
+	lobbyEngineSvc lobbyEngineService
 }
 
 func (h *joinLobbyHandler) Handle(ctx context.Context, req *pb.JoinToLobbyRequest) (*pb.JoinToLobbyResponse, error) {
-	bf, err := h.gameEngineSvc.StartNewGame(ctx)
+	vf := &joinToLobbyForm{}
+	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallNewGameError(err)
+		if !valid {
+			return nil, h.marshallerSvc.marshallJoinToLobbyError(err)
+		}
+
+		return nil, h.marshallerSvc.marshallJoinToLobbyError(err)
 	}
 
-	return h.marshallerSvc.marshallNewGame(bf), nil
+	playerAccessToken, err := h.lobbyEngineSvc.JoinToLobby(ctx, vf.PlayerUUID)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallJoinToLobbyError(err)
+	}
+
+	return h.marshallerSvc.marshallJoinToLobbyResponse(playerAccessToken), nil
 }

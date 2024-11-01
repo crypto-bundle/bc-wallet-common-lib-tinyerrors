@@ -34,12 +34,12 @@ package models
 
 import "github.com/google/uuid"
 
-type AccessTokensPair struct {
-	PairUUID     uuid.UUID
-	AccessTokens [2]uuid.UUID
+type AccessToken struct {
+	PlayerUUID  uuid.UUID
+	AccessToken uuid.UUID
 }
 
-func (ac *AccessTokensPair) Clone() *AccessTokensPair {
+func (ac *AccessToken) Clone() *AccessToken {
 	data := *ac
 
 	return &data

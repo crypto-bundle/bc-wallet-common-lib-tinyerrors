@@ -31,3 +31,19 @@
  */
 
 package grpcserver
+
+import (
+	"tiktaktoe/models"
+
+	pb "tiktaktoe/pkg"
+)
+
+type joinToLobbyMarshaller struct {
+}
+
+func (m *joinToLobbyMarshaller) marshallJoinToLobby(dataModel *models.AccessToken) *pb.JoinToLobbyResponse {
+	return &pb.JoinToLobbyResponse{
+		UserUUID:  dataModel.PlayerUUID.String(),
+		TokenUUID: dataModel.AccessToken.String(),
+	}
+}
