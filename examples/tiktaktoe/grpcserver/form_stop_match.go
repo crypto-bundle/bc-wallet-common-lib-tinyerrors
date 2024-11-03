@@ -30,29 +30,35 @@
  *
  */
 
-package models
+package grpcserver
 
 import (
+	"context"
+	validate "github.com/asaskevich/govalidator/v11"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 	"github.com/google/uuid"
+	pb "tiktaktoe/pkg"
+	"tiktaktoe/types"
 )
 
-type BattleField struct {
-	Players        [2]uuid.UUID
-	Size           uint8
-	UUID           uuid.UUID
-	TokensPairUUID uuid.UUID
+type stopMatchForm struct {
+	MatchUUID uuid.UUID `valid:"uuid,required"`
 }
 
-func (bf *BattleField) Clone() *BattleField {
-	data := *bf
+func (f *stopMatchForm) LoadAndValidate(_ context.Context,
+	req *pb.StopMatchRequest,
+) (valid bool, err error) {
+	matchUUID, err := uuid.Parse(req.MatchUUID)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
 
-	return &data
-}
+	f.MatchUUID = matchUUID
 
-func (bf *BattleField) GetSize() uint8 {
-	return bf.Size
-}
+	_, err = validate.ValidateStruct(f)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
 
-func (bf *BattleField) GetUUID() uuid.UUID {
-	return bf.UUID
+	return true, nil
 }

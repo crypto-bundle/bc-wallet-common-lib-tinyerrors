@@ -48,6 +48,9 @@ func (c MatchProgressStatus) String() string {
 	switch c {
 	case MatchStillInProgress:
 		return MatchStillInProgressText
+	case MatchStopped:
+		return MatchStoppedText
+
 	case MatchAlreadyEnded:
 		return MatchAlreadyEndedText
 	default:
@@ -55,6 +58,23 @@ func (c MatchProgressStatus) String() string {
 	}
 }
 
-type CurrentMovementStatus uint8
+type MovementStatus uint8
 
-type NextMovementStatus uint8
+const (
+	MovementStatusX MovementStatus = iota + 1
+	MovementStatusO
+
+	MovementStatusXText = "movement_of_X"
+	MovementStatusOText = "movement_of_O"
+)
+
+func (c MovementStatus) String() string {
+	switch c {
+	case MovementStatusX:
+		return MovementStatusXText
+	case MovementStatusO:
+		return MovementStatusOText
+	default:
+		return "<nil>"
+	}
+}

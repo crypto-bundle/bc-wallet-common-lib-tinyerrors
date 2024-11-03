@@ -38,16 +38,26 @@ import (
 	pb "tiktaktoe/pkg"
 )
 
-type newGameHandler struct {
-	marshallerSvc marshallerNewGameService
+type stopMatchHandler struct {
+	marshallerSvc marshallerStopMatchService
 	gameEngineSvc gameEngineService
 }
 
-func (h *newGameHandler) Handle(ctx context.Context, req *pb.StartMatchRequest) (*pb.StartMatchResponse, error) {
-	bf, err := h.gameEngineSvc.StartNewGame(ctx)
+func (h *stopMatchHandler) Handle(ctx context.Context, req *pb.StopMatchRequest) (*pb.StopMatchResponse, error) {
+	vf := &stopMatchForm{}
+	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallNewGameError(err)
+		if !valid {
+			return nil, h.marshallerSvc.marshallStopMatchError(err)
+		}
+
+		return nil, h.marshallerSvc.marshallStopMatchError(err)
 	}
 
-	return h.marshallerSvc.marshallNewGame(bf), nil
+	matchResult, err := h.gameEngineSvc.StopGame(ctx, vf.MatchUUID)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallStopMatchError(err)
+	}
+
+	return h.marshallerSvc.marshallStopMatchResponse(matchResult), nil
 }

@@ -32,7 +32,11 @@
 
 package models
 
-import "github.com/google/uuid"
+import (
+	"tiktaktoe/types"
+
+	"github.com/google/uuid"
+)
 
 type MatchResult struct {
 	MatchUUID uuid.UUID
@@ -41,6 +45,10 @@ type MatchResult struct {
 	WinnerSign int
 
 	MovementCount uint
+
+	Status             types.MatchProgressStatus
+	MovementStatus     types.MovementStatus
+	NextMovementStatus types.MovementStatus
 }
 
 func (mr *MatchResult) Clone() *MatchResult {

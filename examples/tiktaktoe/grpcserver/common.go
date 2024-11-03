@@ -60,6 +60,11 @@ type marshallerNewGameService interface {
 	marshallNewGameError(err error) error
 }
 
+type marshallerStopMatchService interface {
+	marshallStopMatchResponse(matchResultData *models.MatchResult) *pb.StopMatchResponse
+	marshallStopMatchError(err error) error
+}
+
 type gameEngineService interface {
 	StartNewGame(ctx context.Context,
 		playerOneUUID,
@@ -73,7 +78,7 @@ type gameEngineService interface {
 	) (*models.MatchResult, error)
 	StopGame(ctx context.Context,
 		matchUUID uuid.UUID,
-	) error
+	) (*models.MatchResult, error)
 }
 
 type joinToLobbyHandlerService interface {

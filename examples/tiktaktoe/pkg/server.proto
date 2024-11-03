@@ -9,24 +9,21 @@ enum ErrorReasons {
 }
 
 enum MatchProgressStatus {
-  MATCH_STILL_IN_PROGRESS = 0;
-  MATCH_ALREADY_ENDED = 1;
+  MATCH_STATUS_PLACEHOLDER = 0;
+  MATCH_STILL_IN_PROGRESS = 1;
+  MATCH_ALREADY_ENDED = 2;
 }
 
-enum CurrentMovementStatus {
-  AWAIT_FOR_0_MOVE = 0;
-  AWAIT_FOR_X_MOVE = 1;
-}
-
-enum NextMovementStatus {
-  NEXT_MOVE_O = 0;
-  NEXT_MOVE_X = 1;
+enum MovementStatus {
+  MOVE_OF_PLACEHOLDER = 0;
+  MOVE_OF_X = 1;
+  MOVE_OF_O = 2;
 }
 
 message MatchStatus {
   MatchProgressStatus ProgressStatus = 1;
-  CurrentMovementStatus MovementStatus = 2;
-  NextMovementStatus NextMove = 3;
+  MovementStatus CurrentMovementStatus = 2;
+  MovementStatus NextMoveStatus = 3;
 }
 
 message MatchInfo {
@@ -41,16 +38,6 @@ message JoinToLobbyRequest {
 message JoinToLobbyResponse {
   string UserUUID = 1;
   string TokenUUID = 2;
-}
-
-message StartMatchRequest {
-  uint32 BattleFieldSize = 1;
-}
-
-message StartMatchResponse {
-  string MatchUUID = 1;
-  uint32 BattleFieldSize = 2;
-  MatchStatus MatchStatus = 3;
 }
 
 message PlayerMoveRequest {
@@ -78,11 +65,11 @@ message MatchStatusResponse {
 }
 
 message StopMatchRequest {
-  string GameUUID = 1;
+  string MatchUUID = 1;
 }
 
 message StopMatchResponse {
-  string GameUUID = 1;
+  string MatchUUID = 1;
   MatchStatus MatchStatus = 2;
 }
 
@@ -95,8 +82,7 @@ message MathListResponse {
 
 service GameApi {
   rpc JoinToLobby                 (JoinToLobbyRequest)               returns (JoinToLobbyResponse) {}
-  rpc StartMatch                    (StartMatchRequest)                returns (StartMatchResponse) {}
-  rpc StopMatch                     (StartMatchRequest)                returns (StartMatchResponse) {}
+  rpc StopMatch                     (StopMatchRequest)                returns (StopMatchResponse) {}
   rpc PlayerMove                      (PlayerMoveRequest)                  returns (PlayerMoveResponse) {}
   rpc GetMathStatus                    (MatchStatusRequest)               returns (MatchStatusResponse) {}
   rpc GetMathList                      (MathListRequest)                  returns (MathListResponse) {}

@@ -30,29 +30,4 @@
  *
  */
 
-package models
-
-import (
-	"github.com/google/uuid"
-)
-
-type BattleField struct {
-	Players        [2]uuid.UUID
-	Size           uint8
-	UUID           uuid.UUID
-	TokensPairUUID uuid.UUID
-}
-
-func (bf *BattleField) Clone() *BattleField {
-	data := *bf
-
-	return &data
-}
-
-func (bf *BattleField) GetSize() uint8 {
-	return bf.Size
-}
-
-func (bf *BattleField) GetUUID() uuid.UUID {
-	return bf.UUID
-}
+package grpcserver
