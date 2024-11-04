@@ -34,7 +34,6 @@ package grpcserver
 
 import (
 	"context"
-
 	"tiktaktoe/models"
 	pb "tiktaktoe/pkg"
 
@@ -43,6 +42,13 @@ import (
 
 type lobbyEngineService interface {
 	JoinToLobby(ctx context.Context, playerUUID uuid.UUID) (token *models.AccessToken, err error)
+}
+
+type matchDataStoreService interface {
+	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
+	GetAllMatches(_ context.Context) (count uint, list []*models.MatchResult, err error)
+	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
+	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
 }
 
 type marshallerJoinToLobbyService interface {
@@ -55,14 +61,19 @@ type marshallerPlayerMoveService interface {
 	marshallPlayerMoveError(err error) error
 }
 
-type marshallerNewGameService interface {
-	marshallNewGameResponse(dataModel *models.BattleField) *pb.StartMatchResponse
-	marshallNewGameError(err error) error
-}
-
 type marshallerStopMatchService interface {
 	marshallStopMatchResponse(matchResultData *models.MatchResult) *pb.StopMatchResponse
 	marshallStopMatchError(err error) error
+}
+
+type marshallerGetMatchStatusService interface {
+	marshallGetMatchStatusResponse(matchResultData *models.MatchResult) *pb.MatchStatusResponse
+	marshallGetMatchStatusError(err error) error
+}
+
+type marshallerGetMatchListService interface {
+	marshallMatchListResponse(matchResultData []*models.MatchResult) *pb.MathListResponse
+	marshallMatchListError(err error) error
 }
 
 type gameEngineService interface {
@@ -79,14 +90,13 @@ type gameEngineService interface {
 	StopGame(ctx context.Context,
 		matchUUID uuid.UUID,
 	) (*models.MatchResult, error)
+	GetMatchStatus(ctx context.Context,
+		matchUUID uuid.UUID,
+	) (*models.MatchResult, error)
 }
 
 type joinToLobbyHandlerService interface {
 	Handle(ctx context.Context, req *pb.JoinToLobbyRequest) (*pb.JoinToLobbyResponse, error)
-}
-
-type newGameHandlerService interface {
-	Handle(ctx context.Context, req *pb.StartMatchRequest) (*pb.StartMatchResponse, error)
 }
 
 type stopGameHandlerService interface {

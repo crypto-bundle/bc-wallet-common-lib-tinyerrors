@@ -44,7 +44,6 @@ type grpcService struct {
 	gameEngineSvc gameEngineService
 
 	joinToLobbyHandlerSvc    joinToLobbyHandlerService
-	newGameHandlerSvc        newGameHandlerService
 	stopGameHandlerSvc       stopGameHandlerService
 	playerMoveHandlerSvc     playerMoveHandlerService
 	getMatchStatusHandlerSvc getMatchStatusHandlerService
@@ -55,10 +54,6 @@ func (h *grpcService) JoinToLobby(ctx context.Context, req *pb.JoinToLobbyReques
 	return h.joinToLobbyHandlerSvc.Handle(ctx, req)
 }
 
-func (h *grpcService) StartMatch(ctx context.Context, req *pb.StartMatchRequest) (*pb.StartMatchResponse, error) {
-	return h.newGameHandlerSvc.Handle(ctx, req)
-}
-
 func (h *grpcService) StopMatch(ctx context.Context, req *pb.StopMatchRequest) (*pb.StopMatchResponse, error) {
 	return h.stopGameHandlerSvc.Handle(ctx, req)
 }
@@ -67,11 +62,11 @@ func (h *grpcService) PlayerMove(ctx context.Context, req *pb.PlayerMoveRequest)
 	return h.playerMoveHandlerSvc.Handle(ctx, req)
 }
 
-func (h *grpcService) GetMathStatus(ctx context.Context, req *pb.MatchStatusRequest) (*pb.MatchStatusResponse, error) {
+func (h *grpcService) GetMatchStatus(ctx context.Context, req *pb.MatchStatusRequest) (*pb.MatchStatusResponse, error) {
 	return h.getMatchStatusHandlerSvc.Handle(ctx, req)
 }
 
-func (h *grpcService) GetMathList(ctx context.Context, req *pb.MathListRequest) (*pb.MathListResponse, error) {
+func (h *grpcService) GetMatchList(ctx context.Context, req *pb.MathListRequest) (*pb.MathListResponse, error) {
 	return h.getMatchListHandlerSvc.Handle(ctx, req)
 }
 

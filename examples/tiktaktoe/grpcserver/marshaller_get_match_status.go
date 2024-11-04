@@ -33,35 +33,21 @@
 package grpcserver
 
 import (
-	"context"
-
+	"tiktaktoe/models"
 	pb "tiktaktoe/pkg"
-	"tiktaktoe/types"
-
-	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
-
-	validate "github.com/asaskevich/govalidator/v11"
-	"github.com/google/uuid"
 )
 
-type getMatchStatusForm struct {
-	MatchUUID uuid.UUID `valid:"uuid,required"`
+type getMatchStatusMarshaller struct {
 }
 
-func (f *getMatchStatusForm) LoadAndValidate(_ context.Context,
-	req *pb.MatchStatusRequest,
-) (valid bool, err error) {
-	matchUUID, err := uuid.Parse(req.MatchUUID)
-	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+func (m *getMatchStatusMarshaller) marshallStopMatchResponse(matchResultData *models.MatchResult,
+) *pb.MatchStatusResponse {
+	return &pb.MatchStatusResponse{
+		MatchUUID: matchResultData.MatchUUID.String(),
+		MatchStatus: &pb.MatchStatus{
+			ProgressStatus:        pb.MatchProgressStatus(matchResultData.Status),
+			CurrentMovementStatus: pb.MovementStatus(matchResultData.MovementStatus),
+			NextMoveStatus:        pb.MovementStatus(matchResultData.NextMovementStatus),
+		},
 	}
-
-	f.MatchUUID = matchUUID
-
-	_, err = validate.ValidateStruct(f)
-	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
-	}
-
-	return true, nil
 }

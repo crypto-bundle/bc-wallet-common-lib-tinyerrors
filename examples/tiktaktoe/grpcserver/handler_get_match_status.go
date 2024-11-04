@@ -31,3 +31,32 @@
  */
 
 package grpcserver
+
+import (
+	"context"
+	pb "tiktaktoe/pkg"
+)
+
+type getMatchStatusHandler struct {
+	marshallerSvc marshallerGetMatchStatusService
+	gameEngineSvc gameEngineService
+}
+
+func (h *getMatchStatusHandler) Handle(ctx context.Context, req *pb.MatchStatusRequest) (*pb.MatchStatusResponse, error) {
+	vf := &getMatchStatusForm{}
+	valid, err := vf.LoadAndValidate(ctx, req)
+	if err != nil {
+		if !valid {
+			return nil, h.marshallerSvc.marshallGetMatchStatusError(err)
+		}
+
+		return nil, h.marshallerSvc.marshallGetMatchStatusError(err)
+	}
+
+	matchResult, err := h.gameEngineSvc.GetMatchStatus(ctx, vf.MatchUUID)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallGetMatchStatusError(err)
+	}
+
+	return h.marshallerSvc.marshallGetMatchStatusResponse(matchResult), nil
+}

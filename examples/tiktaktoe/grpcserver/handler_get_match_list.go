@@ -31,3 +31,22 @@
  */
 
 package grpcserver
+
+import (
+	"context"
+	pb "tiktaktoe/pkg"
+)
+
+type getMatchListHandler struct {
+	marshallerSvc marshallerGetMatchListService
+	matchDataSvc  matchDataStoreService
+}
+
+func (h *getMatchListHandler) Handle(ctx context.Context, req *pb.MathListRequest) (*pb.MathListResponse, error) {
+	_, matchResults, err := h.matchDataSvc.GetAllMatches(ctx)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallMatchListError(err)
+	}
+
+	return h.marshallerSvc.marshallMatchListResponse(matchResults), nil
+}

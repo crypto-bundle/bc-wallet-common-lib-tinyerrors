@@ -33,35 +33,31 @@
 package grpcserver
 
 import (
-	"context"
-
+	"tiktaktoe/models"
 	pb "tiktaktoe/pkg"
-	"tiktaktoe/types"
-
-	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
-
-	validate "github.com/asaskevich/govalidator/v11"
-	"github.com/google/uuid"
 )
 
-type getMatchStatusForm struct {
-	MatchUUID uuid.UUID `valid:"uuid,required"`
+type getMatchListMarshaller struct {
 }
 
-func (f *getMatchStatusForm) LoadAndValidate(_ context.Context,
-	req *pb.MatchStatusRequest,
-) (valid bool, err error) {
-	matchUUID, err := uuid.Parse(req.MatchUUID)
-	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+func (m *getMatchListMarshaller) marshallMatchListResponse(matchResultData []*models.MatchResult,
+) *pb.MathListResponse {
+	result := &pb.MathListResponse{
+		MatchList: make([]*pb.MatchInfo, 0, len(matchResultData)),
 	}
 
-	f.MatchUUID = matchUUID
+	for i := range matchResultData {
+		item := matchResultData[i]
 
-	_, err = validate.ValidateStruct(f)
-	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+		result.MatchList[i] = &pb.MatchInfo{
+			MatchUUID: item.MatchUUID.String(),
+			MatchStatus: &pb.MatchStatus{
+				ProgressStatus:        pb.MatchProgressStatus(item.Status),
+				CurrentMovementStatus: pb.MovementStatus(item.MovementStatus),
+				NextMoveStatus:        pb.MovementStatus(item.NextMovementStatus),
+			},
+		}
 	}
 
-	return true, nil
+	return result
 }
