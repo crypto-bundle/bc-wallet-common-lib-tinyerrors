@@ -63,6 +63,7 @@ func (c TinyErrCodeInt) I18n() string {
 type ErrorFormatterService interface {
 	ErrorWithCode(err error, code TinyErrCode) error
 	ErrWithCode(err error, code TinyErrCode) error
+	NewErrorWithCode(text string, code TinyErrCode) error
 	ErrorGetCode(err error) TinyErrCode
 	ErrGetCode(err error) TinyErrCode
 	// ErrorNoWrap function for pseudo-wrap error, must be used in case of linter warnings...

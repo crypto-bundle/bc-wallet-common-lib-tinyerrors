@@ -72,6 +72,13 @@ func (s *FmtService) ErrorWithCode(err error, code TinyErrCode) error {
 	}
 }
 
+func (s *FmtService) NewErrorWithCode(text string, code TinyErrCode) error {
+	return &codeContainsError{
+		Err:  errors.New(text),
+		code: code,
+	}
+}
+
 func (s *FmtService) ErrNoWrap(err error) error {
 	return s.ErrorNoWrap(err)
 }

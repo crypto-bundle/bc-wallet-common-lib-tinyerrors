@@ -76,6 +76,10 @@ func ErrWithCode(err error, code TinyErrCode) error {
 	return DefaultErrorFormatterSvc.ErrWithCode(err, code)
 }
 
+func NewErrorWithCode(text string, code TinyErrCode) error {
+	return DefaultErrorFormatterSvc.NewErrorWithCode(text, code)
+}
+
 func ErrorGetCode(err error) TinyErrCode {
 	return DefaultErrorFormatterSvc.ErrorGetCode(err)
 }
