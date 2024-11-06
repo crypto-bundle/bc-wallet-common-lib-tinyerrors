@@ -53,14 +53,14 @@ var (
 type store struct {
 	mu sync.Mutex
 
-	tokensMap map[uuid.UUID]models.AccessTokensPair
+	tokensMap map[uuid.UUID]models.AccessToken
 }
 
-func (s *store) GetTokensByMatchUUID(_ context.Context, matchUUID uuid.UUID) (*models.AccessTokensPair, error) {
+func (s *store) GetTokenInfoByTokenUUID(_ context.Context, tokenUUID uuid.UUID) (*models.AccessToken, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	tokensData, isExists := s.tokensMap[matchUUID]
+	tokensData, isExists := s.tokensMap[tokenUUID]
 	if !isExists {
 		return nil, tinyerrors.ErrWithCode(ErrTokensNotFound, types.TinyErrorAccessTokensNotFound)
 	}
@@ -68,16 +68,23 @@ func (s *store) GetTokensByMatchUUID(_ context.Context, matchUUID uuid.UUID) (*m
 	return tokensData.Clone(), nil
 }
 
-func (s *store) AddTokens(_ context.Context, tokensData *models.AccessTokensPair) error {
+func (s *store) AddTokenInfo(_ context.Context, tokensData *models.AccessToken) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	_, isExists := s.tokensMap[tokensData.MatchUUID]
+	_, isExists := s.tokensMap[tokensData.AccessToken]
 	if isExists {
 		return tinyerrors.ErrWithCode(ErrTokensAlreadyExists, types.TinyErrorAccessTokensNotFound)
 	}
 
-	s.tokensMap[tokensData.MatchUUID] = *tokensData.Clone()
+	s.tokensMap[tokensData.AccessToken] = *tokensData.Clone()
 
 	return nil
+}
+
+func NewDataStore() *store {
+	return &store{
+		mu:        sync.Mutex{},
+		tokensMap: make(map[uuid.UUID]models.AccessToken),
+	}
 }

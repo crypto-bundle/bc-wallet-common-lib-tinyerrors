@@ -31,3 +31,39 @@
  */
 
 package grpcserver
+
+import (
+	"context"
+	pb "tiktaktoe/pkg"
+)
+
+type getMatchMovementListHandler struct {
+	marshallerSvc marshallerGetMatchMovementListService
+	matchDataSvc  matchDataStoreService
+}
+
+func (h *getMatchMovementListHandler) Handle(ctx context.Context,
+	req *pb.MathMovementListRequest,
+) (*pb.MathMovementListResponse, error) {
+	vf := &getMatchMovementsListForm{}
+	valid, err := vf.LoadAndValidate(ctx, req)
+	if err != nil {
+		if !valid {
+			return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+		}
+
+		return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+	}
+
+	matchResult, err := h.matchDataSvc.GetMatchInfo(ctx, vf.MatchUUID)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+	}
+
+	_, matchMovements, err := h.matchDataSvc.GetAllMatchMovement(ctx, vf.MatchUUID)
+	if err != nil {
+		return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+	}
+
+	return h.marshallerSvc.marshallMatchMovementsListResponse(matchResult, matchMovements), nil
+}

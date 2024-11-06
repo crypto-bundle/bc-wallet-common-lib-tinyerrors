@@ -42,8 +42,8 @@ import (
 )
 
 type accessTokenStorageService interface {
-	GetTokensByPairUUID(_ context.Context, pairUUID uuid.UUID) (*models.AccessTokensPair, error)
-	AddTokens(_ context.Context, tokensData *models.AccessTokensPair) error
+	GetTokenInfoByTokenUUID(_ context.Context, tokenUUID uuid.UUID) (*models.AccessToken, error)
+	AddTokenInfo(_ context.Context, tokensData *models.AccessToken) error
 }
 
 type matchDataStoreService interface {

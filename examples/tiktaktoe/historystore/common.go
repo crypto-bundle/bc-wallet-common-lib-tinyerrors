@@ -30,18 +30,17 @@
  *
  */
 
-package models
+package historystore
 
-import "github.com/google/uuid"
+import (
+	"context"
+	"github.com/google/uuid"
+	"tiktaktoe/models"
+)
 
-type Movement struct {
-	PlayerUUID      uuid.UUID
-	Position        [2]uint8
-	BattleFieldUUID uuid.UUID
-}
-
-func (m *Movement) Clone() *Movement {
-	data := *m
-
-	return &data
+type matchDataStoreService interface {
+	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) (*models.MatchResult, error)
+	GetAllMatches(_ context.Context) (count uint, list []*models.MatchResult, err error)
+	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) (uint, []*models.Movement, error)
+	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
 }

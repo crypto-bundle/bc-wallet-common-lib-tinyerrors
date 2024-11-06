@@ -45,9 +45,9 @@ type lobbyEngineService interface {
 }
 
 type matchDataStoreService interface {
-	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) *models.BattleField
+	GetMatchInfo(_ context.Context, matchUUID uuid.UUID) (*models.MatchResult, error)
 	GetAllMatches(_ context.Context) (count uint, list []*models.MatchResult, err error)
-	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) ([]*models.Movement, error)
+	GetAllMatchMovement(_ context.Context, matchUUID uuid.UUID) (uint, []*models.Movement, error)
 	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
 }
 
@@ -74,6 +74,13 @@ type marshallerGetMatchStatusService interface {
 type marshallerGetMatchListService interface {
 	marshallMatchListResponse(matchResultData []*models.MatchResult) *pb.MathListResponse
 	marshallMatchListError(err error) error
+}
+
+type marshallerGetMatchMovementListService interface {
+	marshallMatchMovementsListResponse(matchResultData *models.MatchResult,
+		movementsList []*models.Movement,
+	) *pb.MathMovementListResponse
+	marshallMatchMovementsListError(err error) error
 }
 
 type gameEngineService interface {

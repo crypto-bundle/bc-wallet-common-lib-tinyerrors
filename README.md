@@ -47,7 +47,7 @@ If the capabilities of the standard formatter are not enough for you - use the i
 [bc-wallet-common-lib-errors](https://github.com/crypto-bundle/bc-wallet-common-lib-errors) repository, all changes that expand the capabilities and 
 functionality of the formatter must be committed there.
 
-### ErrorWithCode, ErrWithCode, ErrorGetCode, ErrGetCode
+### ErrorWithCode, ErrWithCode, ErrorGetCode, ErrGetCode, NewErrorWithCode
 Main purpose of these functions - wrap business logic error status-code in error. This use-case relevant as communication option between application layers -
 you don't need use `errors.Is` and import errors from another application layers and sub-package, all you need - it can just compare `int` values. 
 This function fully depend on implementation of error formatter service. 
@@ -60,6 +60,7 @@ Also, examples of error status-code wrapping presented in:
 * [signer application](/examples/signer) - gRPC-server application for sign user-data, witch contains example of error status-code wrapping.
   * [signer/marshaller.go](/examples/signer/marshaller.go)
   * [signer/handlers.go](/examples/signer/handlers.go)
+* [tiktaktoe application](/examples/tiktaktoe) - gRPC-server and game-engine of TikTakToe game
 * [unit tests](/pkg/tinyerrors/errors_test.go) - Unit-tests for all error formatter methods
 
 ### ErrorNoWrap, ErrNoWrap, ErrorNoWrapOrNil, ErrNoWrapOrNil

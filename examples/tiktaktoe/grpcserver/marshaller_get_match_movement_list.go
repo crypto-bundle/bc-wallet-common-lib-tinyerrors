@@ -30,18 +30,41 @@
  *
  */
 
-package models
+package grpcserver
 
-import "github.com/google/uuid"
+import (
+	"tiktaktoe/models"
 
-type Movement struct {
-	PlayerUUID      uuid.UUID
-	Position        [2]uint8
-	BattleFieldUUID uuid.UUID
+	pb "tiktaktoe/pkg"
+)
+
+type getMatchMovementsListMarshaller struct {
 }
 
-func (m *Movement) Clone() *Movement {
-	data := *m
+func (m *getMatchMovementsListMarshaller) marshallMatchMovementsListResponse(matchResultData *models.MatchResult,
+	movementsList []*models.Movement,
+) *pb.MathMovementListResponse {
+	result := &pb.MathMovementListResponse{
+		MatchInfo: &pb.MatchInfo{
+			MatchUUID: matchResultData.MatchUUID.String(),
+			MatchStatus: &pb.MatchStatus{
+				ProgressStatus:        pb.MatchProgressStatus(matchResultData.Status),
+				CurrentMovementStatus: pb.MovementStatus(matchResultData.MovementStatus),
+				NextMoveStatus:        pb.MovementStatus(matchResultData.NextMovementStatus),
+			},
+		},
+		MovementList: make([]*pb.MovementInfo, len(movementsList)),
+	}
 
-	return &data
+	for i := range movementsList {
+		item := movementsList[i]
+
+		result.MovementList[i] = &pb.MovementInfo{
+			PlayerUUID: item.PlayerUUID.String(),
+			PositionX:  uint32(item.Position[0]),
+			PositionY:  uint32(item.Position[1]),
+		}
+	}
+
+	return result
 }

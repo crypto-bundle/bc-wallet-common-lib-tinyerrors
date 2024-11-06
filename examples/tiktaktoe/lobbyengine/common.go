@@ -30,18 +30,15 @@
  *
  */
 
-package models
+package lobbyengine
 
-import "github.com/google/uuid"
+import (
+	"context"
+	"github.com/google/uuid"
+	"tiktaktoe/models"
+)
 
-type Movement struct {
-	PlayerUUID      uuid.UUID
-	Position        [2]uint8
-	BattleFieldUUID uuid.UUID
-}
-
-func (m *Movement) Clone() *Movement {
-	data := *m
-
-	return &data
+type accessTokenStorageService interface {
+	GetTokenInfoByTokenUUID(_ context.Context, tokenUUID uuid.UUID) (*models.AccessToken, error)
+	AddTokenInfo(_ context.Context, tokensData *models.AccessToken) error
 }

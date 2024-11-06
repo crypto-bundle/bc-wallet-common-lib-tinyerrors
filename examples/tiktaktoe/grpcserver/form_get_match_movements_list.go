@@ -30,18 +30,35 @@
  *
  */
 
-package models
+package grpcserver
 
-import "github.com/google/uuid"
+import (
+	"context"
+	validate "github.com/asaskevich/govalidator/v11"
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+	"github.com/google/uuid"
+	pb "tiktaktoe/pkg"
+	"tiktaktoe/types"
+)
 
-type Movement struct {
-	PlayerUUID      uuid.UUID
-	Position        [2]uint8
-	BattleFieldUUID uuid.UUID
+type getMatchMovementsListForm struct {
+	MatchUUID uuid.UUID `valid:"uuid,required"`
 }
 
-func (m *Movement) Clone() *Movement {
-	data := *m
+func (f *getMatchMovementsListForm) LoadAndValidate(_ context.Context,
+	req *pb.MathMovementListRequest,
+) (valid bool, err error) {
+	matchUUID, err := uuid.Parse(req.MatchUUID)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
 
-	return &data
+	f.MatchUUID = matchUUID
+
+	_, err = validate.ValidateStruct(f)
+	if err != nil {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	}
+
+	return true, nil
 }
