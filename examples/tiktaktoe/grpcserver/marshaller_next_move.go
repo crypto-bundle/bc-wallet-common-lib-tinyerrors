@@ -31,3 +31,27 @@
  */
 
 package grpcserver
+
+import (
+	"tiktaktoe/models"
+	pb "tiktaktoe/pkg"
+)
+
+type nextMoveMarshaller struct {
+}
+
+func (m *nextMoveMarshaller) marshallPlayerMoveResponse(matchData *models.MatchResult,
+	movementData *models.Movement,
+) *pb.PlayerMoveResponse {
+	return &pb.PlayerMoveResponse{
+		MatchUUID:  matchData.MatchUUID.String(),
+		PlayerUUID: movementData.PlayerUUID.String(),
+		MatchStatus: &pb.MatchStatus{
+			ProgressStatus:        pb.MatchProgressStatus(matchData.Status),
+			CurrentMovementStatus: pb.MovementStatus(matchData.MovementStatus),
+			NextMoveStatus:        pb.MovementStatus(matchData.NextMovementStatus),
+		},
+		PositionX: uint32(movementData.Position[0]),
+		PositionY: uint32(movementData.Position[0]),
+	}
+}

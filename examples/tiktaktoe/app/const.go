@@ -32,6 +32,21 @@
 
 package app
 
+import (
+	"fmt"
+	"strings"
+)
+
+type Domain string
+
+func (d Domain) WithSubDomain(subDomain string) string {
+	return fmt.Sprintf("%s.%s", subDomain, d)
+}
+
+func (d Domain) WithSubDomains(subDomains ...string) string {
+	return fmt.Sprintf("%s.%s", strings.Join(subDomains, "."), d)
+}
+
 const (
-	Domain = "example_tiktaktoe_game"
+	ApplicationDomain Domain = "tiktaktoe.tinierrors.cbdl.dev"
 )
