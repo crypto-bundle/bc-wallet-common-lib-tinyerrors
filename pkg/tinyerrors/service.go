@@ -58,6 +58,11 @@ func (s *FmtService) ErrorGetCode(err error) TinyErrCode {
 		return ccErr.code
 	}
 
+	codeContainsErr, isCasted := err.(errorCodeContainable)
+	if isCasted {
+		return codeContainsErr.ErrorGetCode(err)
+	}
+
 	return nil
 }
 

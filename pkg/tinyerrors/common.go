@@ -59,8 +59,7 @@ func (c TinyErrCodeInt) I18n() string {
 	return "missing_i18n_key"
 }
 
-//nolint:interfacebloat //it's ok here, we need it we must use it as one big interface
-type ErrorFormatterService interface {
+type errorCodeContainable interface {
 	ErrorWithCode(err error, code TinyErrCode) error
 	ErrWithCode(err error, code TinyErrCode) error
 	NewErrorWithCode(text string, code TinyErrCode) error
@@ -68,6 +67,11 @@ type ErrorFormatterService interface {
 	ErrGetCode(err error) TinyErrCode
 	ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool)
 	ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool)
+}
+
+//nolint:interfacebloat //it's ok here, we need it we must use it as one big interface
+type ErrorFormatterService interface {
+	errorCodeContainable
 	// ErrorNoWrap function for pseudo-wrap error, must be used in case of linter warnings...
 	ErrorNoWrap(err error) error
 	// ErrNoWrap same with ErrorNoWrap function, just alias for ErrorNoWrap, just short function name...
