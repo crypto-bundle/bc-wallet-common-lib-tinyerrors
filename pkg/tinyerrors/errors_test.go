@@ -104,6 +104,68 @@ func TestErrorFormatting(t *testing.T) {
 		}
 	})
 
+	t.Run("ErrCodeIsOneOf", func(t *testing.T) {
+		const (
+			expectedResult = "test error"
+			expectedCode   = TinyErrCodeInt(69)
+			otherCodeOne   = TinyErrCodeInt(100500)
+			otherCodeTwo   = TinyErrCodeInt(100500)
+		)
+
+		targetErr := ErrWithCode(errors.New("test error"), expectedCode)
+
+		foundCode, isCodeOneOf := ErrCodeIsOneOf(targetErr, otherCodeOne, otherCodeTwo, expectedCode)
+		if !isCodeOneOf {
+			t.Error("error is not one of expected codes")
+		}
+
+		if foundCode.Int() != expectedCode.Int() {
+			t.Errorf("error code not equal with expected. current: %d, expected: %d",
+				foundCode, expectedCode)
+		}
+
+		if extractedCode := ErrGetCode(targetErr); extractedCode != expectedCode {
+			t.Errorf("extracted error code not equal with expected. current: %d, expected: %d",
+				extractedCode, expectedCode)
+		}
+
+		if targetErr.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				targetErr.Error(), expectedResult)
+		}
+	})
+
+	t.Run("ErrorCodeIsOneOf", func(t *testing.T) {
+		const (
+			expectedResult = "test error"
+			expectedCode   = TinyErrCodeInt(69)
+			otherCodeOne   = TinyErrCodeInt(100502)
+			otherCodeTwo   = TinyErrCodeInt(100503)
+		)
+
+		targetErr := ErrWithCode(errors.New("test error"), expectedCode)
+
+		foundCode, isCodeOneOf := ErrorCodeIsOneOf(targetErr, otherCodeOne, otherCodeTwo, expectedCode)
+		if !isCodeOneOf {
+			t.Error("error is not one of expected codes")
+		}
+
+		if foundCode.Int() != expectedCode.Int() {
+			t.Errorf("error code not equal with expected. current: %d, expected: %d",
+				foundCode, expectedCode)
+		}
+
+		if extractedCode := ErrGetCode(targetErr); extractedCode != expectedCode {
+			t.Errorf("extracted error code not equal with expected. current: %d, expected: %d",
+				extractedCode, expectedCode)
+		}
+
+		if targetErr.Error() != expectedResult {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				targetErr.Error(), expectedResult)
+		}
+	})
+
 	t.Run("ErrorNoWrap", func(t *testing.T) {
 		const expectedResult = "test error"
 

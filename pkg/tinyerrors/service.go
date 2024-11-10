@@ -61,6 +61,25 @@ func (s *FmtService) ErrorGetCode(err error) TinyErrCode {
 	return nil
 }
 
+func (s *FmtService) ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+	return s.ErrorCodeIsOneOf(err, codes...)
+}
+
+func (s *FmtService) ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+	errCode := s.ErrorGetCode(err)
+	if errCode == nil {
+		return nil, false
+	}
+
+	for _, targetCode := range codes {
+		if targetCode.Int() == errCode.Int() {
+			return targetCode, true
+		}
+	}
+
+	return nil, false
+}
+
 func (s *FmtService) ErrWithCode(err error, code TinyErrCode) error {
 	return s.ErrorWithCode(err, code)
 }

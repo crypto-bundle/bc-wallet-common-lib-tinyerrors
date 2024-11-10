@@ -88,6 +88,14 @@ func ErrGetCode(err error) TinyErrCode {
 	return DefaultErrorFormatterSvc.ErrGetCode(err)
 }
 
+func ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+	return DefaultErrorFormatterSvc.ErrCodeIsOneOf(err, codes...)
+}
+
+func ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+	return DefaultErrorFormatterSvc.ErrorCodeIsOneOf(err, codes...)
+}
+
 func ErrorNoWrap(err error) error {
 	return DefaultErrorFormatterSvc.ErrorNoWrap(err)
 }

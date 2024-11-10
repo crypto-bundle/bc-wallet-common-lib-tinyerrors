@@ -66,6 +66,8 @@ type ErrorFormatterService interface {
 	NewErrorWithCode(text string, code TinyErrCode) error
 	ErrorGetCode(err error) TinyErrCode
 	ErrGetCode(err error) TinyErrCode
+	ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool)
+	ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool)
 	// ErrorNoWrap function for pseudo-wrap error, must be used in case of linter warnings...
 	ErrorNoWrap(err error) error
 	// ErrNoWrap same with ErrorNoWrap function, just alias for ErrorNoWrap, just short function name...
