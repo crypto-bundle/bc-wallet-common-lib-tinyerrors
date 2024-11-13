@@ -38,10 +38,15 @@ import (
 )
 
 type getMatchListMarshaller struct {
+	commonMarshallerSvc marshallerCommonService
+	handlerName         string
 }
 
-func (m *getMatchListMarshaller) marshallMatchListResponse(matchResultData []*models.MatchResult,
-) *pb.MathListResponse {
+func (m *getMatchListMarshaller) MarshallError(err error) error {
+	return m.commonMarshallerSvc.MarshallError(m.handlerName, err)
+}
+
+func (m *getMatchListMarshaller) MarshalResponse(matchResultData []*models.MatchResult) *pb.MathListResponse {
 	result := &pb.MathListResponse{
 		MatchList: make([]*pb.MatchInfo, 0, len(matchResultData)),
 	}
@@ -60,4 +65,11 @@ func (m *getMatchListMarshaller) marshallMatchListResponse(matchResultData []*mo
 	}
 
 	return result
+}
+
+func newGetMatchListMarshaller(commonMarshallerSvc marshallerCommonService) *getMatchListMarshaller {
+	return &getMatchListMarshaller{
+		handlerName:         HandlerGetMatchListName,
+		commonMarshallerSvc: commonMarshallerSvc,
+	}
 }

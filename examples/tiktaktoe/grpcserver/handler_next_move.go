@@ -38,6 +38,8 @@ import (
 	pb "tiktaktoe/pkg"
 )
 
+const HandlerNextMoveName = "PlayerMove"
+
 type nextMoveHandler struct {
 	marshallerSvc marshallerPlayerMoveService
 	gameEngineSvc gameEngineService
@@ -48,10 +50,10 @@ func (h *nextMoveHandler) Handle(ctx context.Context, req *pb.PlayerMoveRequest)
 	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
 		if !valid {
-			return nil, h.marshallerSvc.marshallPlayerMoveError(err)
+			return nil, h.marshallerSvc.MarshallError(err)
 		}
 
-		return nil, h.marshallerSvc.marshallPlayerMoveError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
 	matchResult, err := h.gameEngineSvc.SetPlayerMovement(ctx, vf.MatchUUID, vf.PlayerUUID, [2]uint8{
@@ -59,8 +61,17 @@ func (h *nextMoveHandler) Handle(ctx context.Context, req *pb.PlayerMoveRequest)
 		vf.PositionY,
 	})
 	if err != nil {
-		return nil, h.marshallerSvc.marshallPlayerMoveError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
-	return h.marshallerSvc.marshallPlayerMoveResponse(matchResult), nil
+	return h.marshallerSvc.MarshalResponse(matchResult), nil
+}
+
+func newNextMoveHandler(gameEngineSvc gameEngineService,
+	marshallerSvc marshallerPlayerMoveService,
+) *nextMoveHandler {
+	return &nextMoveHandler{
+		marshallerSvc: marshallerSvc,
+		gameEngineSvc: gameEngineSvc,
+	}
 }

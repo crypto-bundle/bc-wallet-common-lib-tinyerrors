@@ -51,36 +51,42 @@ type matchDataStoreService interface {
 	GetMatchMovementsCount(_ context.Context, matchUUID uuid.UUID) (int, error)
 }
 
+type marshallerCommonService interface {
+	MarshallError(handlerName string, err error) error
+}
+
 type marshallerJoinToLobbyService interface {
-	marshallJoinToLobbyResponse(dataModel *models.AccessToken) *pb.JoinToLobbyResponse
-	marshallJoinToLobbyError(err error) error
+	MarshallError(err error) error
+	MarshalResponse(dataModel *models.AccessToken) *pb.JoinToLobbyResponse
 }
 
 type marshallerPlayerMoveService interface {
-	marshallPlayerMoveResponse(dataModel *models.MatchResult) *pb.PlayerMoveResponse
-	marshallPlayerMoveError(err error) error
+	MarshallError(err error) error
+	MarshalResponse(matchData *models.MatchResult,
+		movementData *models.Movement,
+	) *pb.PlayerMoveResponse
 }
 
 type marshallerStopMatchService interface {
-	marshallStopMatchResponse(matchResultData *models.MatchResult) *pb.StopMatchResponse
-	marshallStopMatchError(err error) error
+	MarshallError(err error) error
+	MarshalResponse(matchResultData *models.MatchResult) *pb.StopMatchResponse
 }
 
 type marshallerGetMatchStatusService interface {
-	marshallGetMatchStatusResponse(matchResultData *models.MatchResult) *pb.MatchStatusResponse
-	marshallGetMatchStatusError(err error) error
+	MarshallError(err error) error
+	MarshalResponse(matchResultData *models.MatchResult) *pb.MatchStatusResponse
 }
 
 type marshallerGetMatchListService interface {
-	marshallMatchListResponse(matchResultData []*models.MatchResult) *pb.MathListResponse
-	marshallMatchListError(err error) error
+	MarshallError(err error) error
+	MarshalResponse(matchResultData []*models.MatchResult) *pb.MathListResponse
 }
 
 type marshallerGetMatchMovementListService interface {
-	marshallMatchMovementsListResponse(matchResultData *models.MatchResult,
+	MarshallError(err error) error
+	MarshalResponse(matchResultData *models.MatchResult,
 		movementsList []*models.Movement,
-	) *pb.MathMovementListResponse
-	marshallMatchMovementsListError(err error) error
+	) *pb.MatchMovementListResponse
 }
 
 type gameEngineService interface {
@@ -116,6 +122,10 @@ type playerMoveHandlerService interface {
 
 type getMatchStatusHandlerService interface {
 	Handle(ctx context.Context, request *pb.MatchStatusRequest) (*pb.MatchStatusResponse, error)
+}
+
+type getMatchMovementListHandlerService interface {
+	Handle(ctx context.Context, request *pb.MatchMovementListRequest) (*pb.MatchMovementListResponse, error)
 }
 
 type getMatchListHandlerService interface {

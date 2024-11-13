@@ -38,6 +38,8 @@ import (
 	pb "tiktaktoe/pkg"
 )
 
+const HandlerStopMatchName = "StopMatch"
+
 type stopMatchHandler struct {
 	marshallerSvc marshallerStopMatchService
 	gameEngineSvc gameEngineService
@@ -48,16 +50,25 @@ func (h *stopMatchHandler) Handle(ctx context.Context, req *pb.StopMatchRequest)
 	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
 		if !valid {
-			return nil, h.marshallerSvc.marshallStopMatchError(err)
+			return nil, h.marshallerSvc.MarshallError(err)
 		}
 
-		return nil, h.marshallerSvc.marshallStopMatchError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
 	matchResult, err := h.gameEngineSvc.StopGame(ctx, vf.MatchUUID)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallStopMatchError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
-	return h.marshallerSvc.marshallStopMatchResponse(matchResult), nil
+	return h.marshallerSvc.MarshalResponse(matchResult), nil
+}
+
+func newStopMatchHandler(gameEngineSvc gameEngineService,
+	marshallerSvc marshallerStopMatchService,
+) *stopMatchHandler {
+	return &stopMatchHandler{
+		marshallerSvc: marshallerSvc,
+		gameEngineSvc: gameEngineSvc,
+	}
 }

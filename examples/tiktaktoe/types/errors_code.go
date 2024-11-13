@@ -48,8 +48,9 @@ const (
 	TinyErrNotYourMovementOrder
 	TinyErrorUnableToCreateBattlefield
 	TinyErrorAccessTokensNotFound
-	TinyErrorAccessAlreadyExists
+	TinyErrorAccessTokenAlreadyExists
 	TinyErrorValidationFailed
+	TinyErrorValidationInternal
 
 	TinyErrCodeMatchAlreadyRegisteredText  = "match_already_registered"
 	TinyErrCodeMatchNotRegisteredText      = "match_not_found"
@@ -62,6 +63,7 @@ const (
 	TinyErrorAccessTokensNotFoundText      = "access_tokens_not_found"
 	TinyErrorAccessAlreadyExistsText       = "access_tokens_already_exists"
 	TinyErrorValidationFailedText          = "validation_error"
+	TinyErrorValidationInternalText        = "validation_internal"
 )
 
 func (c TinyErrStatusCode) Itoa() string {
@@ -103,9 +105,10 @@ func (c TinyErrStatusCode) String() string {
 		return TinyErrorUnableToCreateBattlefieldText
 	case TinyErrorAccessTokensNotFound:
 		return TinyErrorAccessTokensNotFoundText
-	case TinyErrorAccessAlreadyExists:
+	case TinyErrorAccessTokenAlreadyExists:
 		return TinyErrorAccessAlreadyExistsText
-
+	case TinyErrorValidationInternal:
+		return TinyErrorValidationInternalText
 	default:
 		return "<nil>"
 	}

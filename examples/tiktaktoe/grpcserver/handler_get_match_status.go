@@ -47,16 +47,25 @@ func (h *getMatchStatusHandler) Handle(ctx context.Context, req *pb.MatchStatusR
 	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
 		if !valid {
-			return nil, h.marshallerSvc.marshallGetMatchStatusError(err)
+			return nil, h.marshallerSvc.MarshallError(err)
 		}
 
-		return nil, h.marshallerSvc.marshallGetMatchStatusError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
 	matchResult, err := h.gameEngineSvc.GetMatchStatus(ctx, vf.MatchUUID)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallGetMatchStatusError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
-	return h.marshallerSvc.marshallGetMatchStatusResponse(matchResult), nil
+	return h.marshallerSvc.MarshalResponse(matchResult), nil
+}
+
+func newGetMatchStatusHandler(gameEngineSvc gameEngineService,
+	marshallerSvc marshallerGetMatchStatusService,
+) *getMatchStatusHandler {
+	return &getMatchStatusHandler{
+		marshallerSvc: marshallerSvc,
+		gameEngineSvc: gameEngineSvc,
+	}
 }

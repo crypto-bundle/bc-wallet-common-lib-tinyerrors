@@ -86,11 +86,11 @@ message MathListResponse {
   repeated MatchInfo MatchList = 1;
 }
 
-message MathMovementListRequest {
+message MatchMovementListRequest {
   string MatchUUID = 1;
 }
 
-message MathMovementListResponse {
+message MatchMovementListResponse {
   MatchInfo MatchInfo = 1;
   repeated MovementInfo MovementList = 2;
 }
@@ -100,6 +100,6 @@ service GameApi {
   rpc StopMatch                     (StopMatchRequest)                returns (StopMatchResponse) {}
   rpc PlayerMove                      (PlayerMoveRequest)                  returns (PlayerMoveResponse) {}
   rpc GetMatchStatus                    (MatchStatusRequest)               returns (MatchStatusResponse) {}
-  rpc GetMatchMovementList                    (MathMovementListRequest)               returns (MathMovementListResponse) {}
-  rpc GetMatchList                      (MathListRequest)                  returns (MathListResponse) {}
+  rpc GetMatchMovementList            (MatchMovementListRequest)         returns (MatchMovementListResponse) {}
+  rpc GetMatchList                    (MathListRequest)                  returns (MathListResponse) {}
 }

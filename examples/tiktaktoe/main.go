@@ -62,7 +62,6 @@ func main() {
 
 		//RegisterSignerApiServer(grpcServer, NewGrpcService(signHandler))
 		grpcServer.RegisterService(&SignerApi_ServiceDesc, NewGrpcService(signHandler))
-
 		serveErr := grpcServer.Serve(listenConn)
 		if serveErr != nil {
 			logger.Println("unable to start gRPC server", err)

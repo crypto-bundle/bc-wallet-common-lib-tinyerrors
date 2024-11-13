@@ -38,10 +38,15 @@ import (
 )
 
 type getMatchStatusMarshaller struct {
+	commonMarshallerSvc marshallerCommonService
+	handlerName         string
 }
 
-func (m *getMatchStatusMarshaller) marshallStopMatchResponse(matchResultData *models.MatchResult,
-) *pb.MatchStatusResponse {
+func (m *getMatchStatusMarshaller) MarshallError(err error) error {
+	return m.commonMarshallerSvc.MarshallError(m.handlerName, err)
+}
+
+func (m *getMatchStatusMarshaller) MarshalResponse(matchResultData *models.MatchResult) *pb.MatchStatusResponse {
 	return &pb.MatchStatusResponse{
 		MatchUUID: matchResultData.MatchUUID.String(),
 		MatchStatus: &pb.MatchStatus{
@@ -49,5 +54,12 @@ func (m *getMatchStatusMarshaller) marshallStopMatchResponse(matchResultData *mo
 			CurrentMovementStatus: pb.MovementStatus(matchResultData.MovementStatus),
 			NextMoveStatus:        pb.MovementStatus(matchResultData.NextMovementStatus),
 		},
+	}
+}
+
+func newGetMatchStatusMarshaller(commonMarshallerSvc marshallerCommonService) *getMatchStatusMarshaller {
+	return &getMatchStatusMarshaller{
+		handlerName:         HandlerGetMatchListName,
+		commonMarshallerSvc: commonMarshallerSvc,
 	}
 }

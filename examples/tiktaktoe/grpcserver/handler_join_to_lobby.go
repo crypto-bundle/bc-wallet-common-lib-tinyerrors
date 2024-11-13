@@ -49,16 +49,27 @@ func (h *joinLobbyHandler) Handle(ctx context.Context, req *pb.JoinToLobbyReques
 	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
 		if !valid {
-			return nil, h.marshallerSvc.marshallJoinToLobbyError(err)
+			return nil, h.marshallerSvc.MarshallError(err)
 		}
 
-		return nil, h.marshallerSvc.marshallJoinToLobbyError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
 	playerAccessToken, err := h.lobbyEngineSvc.JoinToLobby(ctx, vf.PlayerUUID)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallJoinToLobbyError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
-	return h.marshallerSvc.marshallJoinToLobbyResponse(playerAccessToken), nil
+	return h.marshallerSvc.MarshalResponse(playerAccessToken), nil
+}
+
+func newJoinToLobbyHandler(gameEngineSvc gameEngineService,
+	lobbyEngineSvc lobbyEngineService,
+	marshallerSvc marshallerJoinToLobbyService,
+) *joinLobbyHandler {
+	return &joinLobbyHandler{
+		marshallerSvc:  marshallerSvc,
+		gameEngineSvc:  gameEngineSvc,
+		lobbyEngineSvc: lobbyEngineSvc,
+	}
 }

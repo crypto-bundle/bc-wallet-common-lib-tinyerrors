@@ -38,9 +38,15 @@ import (
 )
 
 type nextMoveMarshaller struct {
+	commonMarshallerSvc marshallerCommonService
+	handlerName         string
 }
 
-func (m *nextMoveMarshaller) marshallPlayerMoveResponse(matchData *models.MatchResult,
+func (m *nextMoveMarshaller) MarshallError(err error) error {
+	return m.commonMarshallerSvc.MarshallError(m.handlerName, err)
+}
+
+func (m *nextMoveMarshaller) MarshalResponse(matchData *models.MatchResult,
 	movementData *models.Movement,
 ) *pb.PlayerMoveResponse {
 	return &pb.PlayerMoveResponse{
@@ -53,5 +59,12 @@ func (m *nextMoveMarshaller) marshallPlayerMoveResponse(matchData *models.MatchR
 		},
 		PositionX: uint32(movementData.Position[0]),
 		PositionY: uint32(movementData.Position[0]),
+	}
+}
+
+func newNextMoveMarshaller(commonMarshallerSvc marshallerCommonService) *nextMoveMarshaller {
+	return &nextMoveMarshaller{
+		handlerName:         HandlerNextMoveName,
+		commonMarshallerSvc: commonMarshallerSvc,
 	}
 }

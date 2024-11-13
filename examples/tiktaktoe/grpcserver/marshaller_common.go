@@ -34,24 +34,84 @@ package grpcserver
 
 import (
 	"errors"
+
 	"tiktaktoe/app"
+	pb "tiktaktoe/pkg"
 	"tiktaktoe/types"
 
 	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 
-	"github.com/asaskevich/govalidator/v11"
+	validate "github.com/go-ozzo/ozzo-validation/v4"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type commonMarshaller struct {
+	serviceName string
+}
+
+func (m *commonMarshaller) getGRPCStatusByErrorCode(errCode tinyerrors.TinyErrCode) codes.Code {
+	switch errCode {
+	case types.TinyErrCodeMatchAlreadyRegistered:
+		return codes.AlreadyExists
+	case types.TinyErrCodeMatchNotRegistered:
+		return codes.NotFound
+	case types.TinyErrFieldAlreadyTaken:
+		return codes.InvalidArgument
+	case types.TinyErrFieldPositionOutOfMap:
+		return codes.InvalidArgument
+	case types.TinyErrAllFieldsTaken:
+		return codes.InvalidArgument
+	case types.TinyErrNotYourMovementOrder:
+		return codes.InvalidArgument
+	case types.TinyErrorUnableToCreateBattlefield:
+		return codes.Internal
+	case types.TinyErrorAccessTokensNotFound:
+		return codes.PermissionDenied
+	case types.TinyErrorAccessTokenAlreadyExists:
+		return codes.InvalidArgument
+	default:
+		return codes.Unknown
+	}
+}
+
+func (m *commonMarshaller) MarshallError(handlerName string, err error) error {
+	_, isValidationError := tinyerrors.ErrorCodeIsOneOf(err,
+		types.TinyErrorValidationFailed, types.TinyErrorValidationInternal)
+	if isValidationError {
+		return m.marshallValidationError(handlerName, err)
+	}
+
+	return m.marshallCommonError(handlerName, err)
+}
+
+func (m *commonMarshaller) marshallCommonError(handlerName string,
+	err error,
+) error {
+	errCode := tinyerrors.ErrorGetCode(err)
+	gRPCStatusCode := m.getGRPCStatusByErrorCode(errCode)
+
+	respStatus, _ := status.New(gRPCStatusCode, errCode.String()).
+		WithDetails(&errdetails.ErrorInfo{
+			Reason: err.Error(),
+			Domain: app.ApplicationDomain.WithSubDomains(handlerName, m.serviceName),
+			Metadata: map[string]string{
+				"error_status_code": errCode.Itoa(),
+				"error_status_i18":  errCode.I18n(),
+			},
+		})
+
+	return respStatus.Err()
 }
 
 func (m *commonMarshaller) marshallValidationError(handlerName string, err error) error {
 	switch tinyerrors.ErrorGetCode(err) {
+	case types.TinyErrorValidationInternal:
+		return m.marshallValidationInternalError(handlerName, err)
+
 	case types.TinyErrorValidationFailed:
-		var errs govalidator.Errors
+		var errs validate.Errors
 
 		isGoValidatorErrors := errors.As(err, &errs)
 		if !isGoValidatorErrors {
@@ -65,15 +125,11 @@ func (m *commonMarshaller) marshallValidationError(handlerName string, err error
 	}
 }
 
-func (m *commonMarshaller) marshallFullValidationError(handlerName string, errs govalidator.Errors) error {
-	metaData := make(map[string]string, len(errs)+2)
-	metaData["internal_error_status_code"] = types.TinyErrorValidationFailed.Itoa()
-	metaData["internal_error_status_i18"] = types.TinyErrorValidationFailed.I18n()
-
+func (m *commonMarshaller) marshallFullValidationError(handlerName string, errs validate.Errors) error {
 	respErrStatus := status.New(codes.InvalidArgument, types.TinyErrorValidationFailed.String())
 
 	for _, e := range errs {
-		var goValErr govalidator.Error
+		var goValErr validate.Error
 
 		isGoValError := errors.As(e, &goValErr)
 		if !isGoValError {
@@ -81,27 +137,48 @@ func (m *commonMarshaller) marshallFullValidationError(handlerName string, errs 
 		}
 
 		respErrStatus, _ = respErrStatus.WithDetails(&errdetails.ErrorInfo{
-			Reason:   goValErr.Error(),
-			Domain:   app.ApplicationDomain.WithSubDomains(goValErr.Name, handlerName),
-			Metadata: metaData,
+			Reason: goValErr.Error(),
+			Domain: app.ApplicationDomain.WithSubDomains(handlerName, m.serviceName),
+			Metadata: map[string]string{
+				"validation_error_i18":     goValErr.Code(),
+				"validation_error_message": goValErr.Message(),
+			},
 		})
-
-		metaData[goValErr.Name] = goValErr.Error()
 	}
 
 	return respErrStatus.Err()
+}
+
+func (m *commonMarshaller) marshallValidationInternalError(handlerName string, err error) error {
+	respStatus, _ := status.New(codes.InvalidArgument, types.TinyErrorValidationInternal.String()).
+		WithDetails(&errdetails.ErrorInfo{
+			Reason: err.Error(),
+			Domain: app.ApplicationDomain.WithSubDomains(handlerName, m.serviceName),
+			Metadata: map[string]string{
+				"error_status_code": types.TinyErrorValidationInternal.Itoa(),
+				"error_status_i18":  types.TinyErrorValidationInternal.I18n(),
+			},
+		})
+
+	return respStatus.Err()
 }
 
 func (m *commonMarshaller) marshallShortValidationError(handlerName string, err error) error {
 	respStatus, _ := status.New(codes.InvalidArgument, types.TinyErrorValidationFailed.String()).
 		WithDetails(&errdetails.ErrorInfo{
 			Reason: err.Error(),
-			Domain: app.ApplicationDomain.WithSubDomain(handlerName),
+			Domain: app.ApplicationDomain.WithSubDomains(handlerName, m.serviceName),
 			Metadata: map[string]string{
-				"internal_error_status_code": types.TinyErrorValidationFailed.Itoa(),
-				"internal_error_status_i18":  types.TinyErrorValidationFailed.I18n(),
+				"error_status_code": types.TinyErrorValidationFailed.Itoa(),
+				"error_status_i18":  types.TinyErrorValidationFailed.I18n(),
 			},
 		})
 
 	return respStatus.Err()
+}
+
+func newCommonMarshaller() *commonMarshaller {
+	return &commonMarshaller{
+		serviceName: pb.GameApi_ServiceDesc.ServiceName,
+	}
 }

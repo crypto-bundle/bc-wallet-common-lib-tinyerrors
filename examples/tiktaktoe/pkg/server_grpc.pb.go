@@ -22,7 +22,7 @@ type GameApiClient interface {
 	StopMatch(ctx context.Context, in *StopMatchRequest, opts ...grpc.CallOption) (*StopMatchResponse, error)
 	PlayerMove(ctx context.Context, in *PlayerMoveRequest, opts ...grpc.CallOption) (*PlayerMoveResponse, error)
 	GetMatchStatus(ctx context.Context, in *MatchStatusRequest, opts ...grpc.CallOption) (*MatchStatusResponse, error)
-	GetMatchMovementList(ctx context.Context, in *MathMovementListRequest, opts ...grpc.CallOption) (*MathMovementListResponse, error)
+	GetMatchMovementList(ctx context.Context, in *MatchMovementListRequest, opts ...grpc.CallOption) (*MatchMovementListResponse, error)
 	GetMatchList(ctx context.Context, in *MathListRequest, opts ...grpc.CallOption) (*MathListResponse, error)
 }
 
@@ -70,8 +70,8 @@ func (c *gameApiClient) GetMatchStatus(ctx context.Context, in *MatchStatusReque
 	return out, nil
 }
 
-func (c *gameApiClient) GetMatchMovementList(ctx context.Context, in *MathMovementListRequest, opts ...grpc.CallOption) (*MathMovementListResponse, error) {
-	out := new(MathMovementListResponse)
+func (c *gameApiClient) GetMatchMovementList(ctx context.Context, in *MatchMovementListRequest, opts ...grpc.CallOption) (*MatchMovementListResponse, error) {
+	out := new(MatchMovementListResponse)
 	err := c.cc.Invoke(ctx, "/pb.GameApi/GetMatchMovementList", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ type GameApiServer interface {
 	StopMatch(context.Context, *StopMatchRequest) (*StopMatchResponse, error)
 	PlayerMove(context.Context, *PlayerMoveRequest) (*PlayerMoveResponse, error)
 	GetMatchStatus(context.Context, *MatchStatusRequest) (*MatchStatusResponse, error)
-	GetMatchMovementList(context.Context, *MathMovementListRequest) (*MathMovementListResponse, error)
+	GetMatchMovementList(context.Context, *MatchMovementListRequest) (*MatchMovementListResponse, error)
 	GetMatchList(context.Context, *MathListRequest) (*MathListResponse, error)
 	mustEmbedUnimplementedGameApiServer()
 }
@@ -117,7 +117,7 @@ func (UnimplementedGameApiServer) PlayerMove(context.Context, *PlayerMoveRequest
 func (UnimplementedGameApiServer) GetMatchStatus(context.Context, *MatchStatusRequest) (*MatchStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMatchStatus not implemented")
 }
-func (UnimplementedGameApiServer) GetMatchMovementList(context.Context, *MathMovementListRequest) (*MathMovementListResponse, error) {
+func (UnimplementedGameApiServer) GetMatchMovementList(context.Context, *MatchMovementListRequest) (*MatchMovementListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMatchMovementList not implemented")
 }
 func (UnimplementedGameApiServer) GetMatchList(context.Context, *MathListRequest) (*MathListResponse, error) {
@@ -209,7 +209,7 @@ func _GameApi_GetMatchStatus_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _GameApi_GetMatchMovementList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MathMovementListRequest)
+	in := new(MatchMovementListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -221,7 +221,7 @@ func _GameApi_GetMatchMovementList_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/pb.GameApi/GetMatchMovementList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameApiServer).GetMatchMovementList(ctx, req.(*MathMovementListRequest))
+		return srv.(GameApiServer).GetMatchMovementList(ctx, req.(*MatchMovementListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

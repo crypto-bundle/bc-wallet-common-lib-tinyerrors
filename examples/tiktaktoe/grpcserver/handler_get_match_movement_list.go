@@ -34,8 +34,11 @@ package grpcserver
 
 import (
 	"context"
+
 	pb "tiktaktoe/pkg"
 )
+
+const HandlerGetMatchMovementListName = "GetMatchMovementList"
 
 type getMatchMovementListHandler struct {
 	marshallerSvc marshallerGetMatchMovementListService
@@ -43,27 +46,36 @@ type getMatchMovementListHandler struct {
 }
 
 func (h *getMatchMovementListHandler) Handle(ctx context.Context,
-	req *pb.MathMovementListRequest,
-) (*pb.MathMovementListResponse, error) {
+	req *pb.MatchMovementListRequest,
+) (*pb.MatchMovementListResponse, error) {
 	vf := &getMatchMovementsListForm{}
 	valid, err := vf.LoadAndValidate(ctx, req)
 	if err != nil {
 		if !valid {
-			return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+			return nil, h.marshallerSvc.MarshallError(err)
 		}
 
-		return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
 	matchResult, err := h.matchDataSvc.GetMatchInfo(ctx, vf.MatchUUID)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
 	_, matchMovements, err := h.matchDataSvc.GetAllMatchMovement(ctx, vf.MatchUUID)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallMatchMovementsListError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
-	return h.marshallerSvc.marshallMatchMovementsListResponse(matchResult, matchMovements), nil
+	return h.marshallerSvc.MarshalResponse(matchResult, matchMovements), nil
+}
+
+func newMatchMovementListHandler(matchDataSvc matchDataStoreService,
+	marshallerSvc marshallerGetMatchMovementListService,
+) *getMatchMovementListHandler {
+	return &getMatchMovementListHandler{
+		marshallerSvc: marshallerSvc,
+		matchDataSvc:  matchDataSvc,
+	}
 }

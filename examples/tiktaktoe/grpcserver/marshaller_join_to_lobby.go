@@ -39,11 +39,24 @@ import (
 )
 
 type joinToLobbyMarshaller struct {
+	handlerName         string
+	commonMarshallerSvc marshallerCommonService
 }
 
-func (m *joinToLobbyMarshaller) marshallJoinToLobby(dataModel *models.AccessToken) *pb.JoinToLobbyResponse {
+func (m *joinToLobbyMarshaller) MarshallError(err error) error {
+	return m.commonMarshallerSvc.MarshallError(m.handlerName, err)
+}
+
+func (m *joinToLobbyMarshaller) MarshalResponse(dataModel *models.AccessToken) *pb.JoinToLobbyResponse {
 	return &pb.JoinToLobbyResponse{
 		UserUUID:  dataModel.PlayerUUID.String(),
 		TokenUUID: dataModel.AccessToken.String(),
+	}
+}
+
+func newJoinToLobbyMarshaller(commonMarshallerSvc marshallerCommonService) *joinToLobbyMarshaller {
+	return &joinToLobbyMarshaller{
+		handlerName:         HandlerGetMatchListName,
+		commonMarshallerSvc: commonMarshallerSvc,
 	}
 }

@@ -41,13 +41,12 @@ import (
 type grpcService struct {
 	pb.UnimplementedGameApiServer
 
-	gameEngineSvc gameEngineService
-
-	joinToLobbyHandlerSvc    joinToLobbyHandlerService
-	stopGameHandlerSvc       stopGameHandlerService
-	playerMoveHandlerSvc     playerMoveHandlerService
-	getMatchStatusHandlerSvc getMatchStatusHandlerService
-	getMatchListHandlerSvc   getMatchListHandlerService
+	joinToLobbyHandlerSvc          joinToLobbyHandlerService
+	stopGameHandlerSvc             stopGameHandlerService
+	playerMoveHandlerSvc           playerMoveHandlerService
+	getMatchStatusHandlerSvc       getMatchStatusHandlerService
+	getMatchMovementListHandlerSvc getMatchMovementListHandlerService
+	getMatchListHandlerSvc         getMatchListHandlerService
 }
 
 func (h *grpcService) JoinToLobby(ctx context.Context, req *pb.JoinToLobbyRequest) (*pb.JoinToLobbyResponse, error) {
@@ -70,9 +69,30 @@ func (h *grpcService) GetMatchList(ctx context.Context, req *pb.MathListRequest)
 	return h.getMatchListHandlerSvc.Handle(ctx, req)
 }
 
-func NewGrpcService(gameEnginSvc gameEngineService) *grpcService {
+func (h *grpcService) GetMatchMovementList(ctx context.Context,
+	req *pb.MatchMovementListRequest,
+) (*pb.MatchMovementListResponse, error) {
+	return h.getMatchMovementListHandlerSvc.Handle(ctx, req)
+}
+
+func NewGrpcService(matchDataStoreSvc matchDataStoreService,
+	gameEnginSvc gameEngineService,
+	lobbyEngineSvc lobbyEngineService,
+) *grpcService {
+	commonMarshallerSvc := newCommonMarshaller()
+
 	return &grpcService{
 		UnimplementedGameApiServer: pb.UnimplementedGameApiServer{},
-		gameEngineSvc:              gameEnginSvc,
+
+		joinToLobbyHandlerSvc: newJoinToLobbyHandler(gameEnginSvc, lobbyEngineSvc,
+			newJoinToLobbyMarshaller(commonMarshallerSvc)),
+		stopGameHandlerSvc:   newStopMatchHandler(gameEnginSvc, newStopMatchMarshaller(commonMarshallerSvc)),
+		playerMoveHandlerSvc: newNextMoveHandler(gameEnginSvc, newNextMoveMarshaller(commonMarshallerSvc)),
+		getMatchStatusHandlerSvc: newGetMatchStatusHandler(gameEnginSvc,
+			newGetMatchStatusMarshaller(commonMarshallerSvc)),
+		getMatchListHandlerSvc: newGetMatchListHandler(matchDataStoreSvc,
+			newGetMatchListMarshaller(commonMarshallerSvc)),
+		getMatchMovementListHandlerSvc: newMatchMovementListHandler(matchDataStoreSvc,
+			newGetMatchMovementsListMarshaller(commonMarshallerSvc)),
 	}
 }

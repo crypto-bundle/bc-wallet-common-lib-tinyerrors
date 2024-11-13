@@ -34,11 +34,16 @@ package grpcserver
 
 import (
 	"context"
-	validate "github.com/asaskevich/govalidator/v11"
-	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
-	"github.com/google/uuid"
+	"errors"
+
 	pb "tiktaktoe/pkg"
 	"tiktaktoe/types"
+
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+
+	validate "github.com/go-ozzo/ozzo-validation/v4"
+	validateIs "github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/google/uuid"
 )
 
 type getMatchMovementsListForm struct {
@@ -50,15 +55,27 @@ func (f *getMatchMovementsListForm) LoadAndValidate(_ context.Context,
 ) (valid bool, err error) {
 	matchUUID, err := uuid.Parse(req.MatchUUID)
 	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationInternal)
 	}
 
 	f.MatchUUID = matchUUID
 
-	_, err = validate.ValidateStruct(f)
-	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	err = validate.Validate(f)
+	if err == nil {
+		return true, nil
 	}
 
-	return true, nil
+	var e validate.InternalError
+	if errors.As(err, &e) {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationInternal)
+	}
+
+	return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+}
+
+func (f *getMatchMovementsListForm) Validate() error {
+	return validate.ValidateStruct(f,
+		validate.Field(&f.MatchUUID,
+			validate.Required, validateIs.UUID),
+	)
 }

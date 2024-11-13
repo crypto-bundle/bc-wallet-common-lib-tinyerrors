@@ -34,13 +34,15 @@ package grpcserver
 
 import (
 	"context"
+	"errors"
 
 	pb "tiktaktoe/pkg"
 	"tiktaktoe/types"
 
 	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
 
-	validate "github.com/asaskevich/govalidator/v11"
+	validate "github.com/go-ozzo/ozzo-validation/v4"
+	validateIs "github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/google/uuid"
 )
 
@@ -53,15 +55,22 @@ func (f *joinToLobbyForm) LoadAndValidate(_ context.Context,
 ) (valid bool, err error) {
 	playerUUID, err := uuid.Parse(req.UserUUID)
 	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationInternal)
 	}
 
 	f.PlayerUUID = playerUUID
 
-	_, err = validate.ValidateStruct(f)
-	if err != nil {
-		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+	var e validate.InternalError
+	if errors.As(err, &e) {
+		return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationInternal)
 	}
 
-	return true, nil
+	return false, tinyerrors.ErrWithCode(err, types.TinyErrorValidationFailed)
+}
+
+func (f *joinToLobbyForm) Validate() error {
+	return validate.ValidateStruct(f,
+		validate.Field(&f.PlayerUUID,
+			validate.Required, validateIs.UUID),
+	)
 }

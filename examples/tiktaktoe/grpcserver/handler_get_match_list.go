@@ -37,16 +37,27 @@ import (
 	pb "tiktaktoe/pkg"
 )
 
+const HandlerGetMatchListName = "GetMatchList"
+
 type getMatchListHandler struct {
 	marshallerSvc marshallerGetMatchListService
 	matchDataSvc  matchDataStoreService
 }
 
-func (h *getMatchListHandler) Handle(ctx context.Context, req *pb.MathListRequest) (*pb.MathListResponse, error) {
+func (h *getMatchListHandler) Handle(ctx context.Context, _ *pb.MathListRequest) (*pb.MathListResponse, error) {
 	_, matchResults, err := h.matchDataSvc.GetAllMatches(ctx)
 	if err != nil {
-		return nil, h.marshallerSvc.marshallMatchListError(err)
+		return nil, h.marshallerSvc.MarshallError(err)
 	}
 
-	return h.marshallerSvc.marshallMatchListResponse(matchResults), nil
+	return h.marshallerSvc.MarshalResponse(matchResults), nil
+}
+
+func newGetMatchListHandler(matchDataSvc matchDataStoreService,
+	marshallerSvc marshallerGetMatchListService,
+) *getMatchListHandler {
+	return &getMatchListHandler{
+		marshallerSvc: marshallerSvc,
+		matchDataSvc:  matchDataSvc,
+	}
 }
