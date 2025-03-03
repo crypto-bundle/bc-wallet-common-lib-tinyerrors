@@ -3,7 +3,7 @@
  *
  * MIT NON-AI License
  *
- * Copyright (c) 2024-2024 Aleksei Kotelnikov(gudron2s@gmail.com)
+ * Copyright (c) 2024-2025 Aleksei Kotelnikov(gudron2s@gmail.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of the software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -32,17 +32,40 @@
 
 package tinyerrors
 
-type codeContainsError struct {
-	Err  error
-	code int
-}
+import (
+	"errors"
+	"testing"
+)
 
-// Error to string converter...
-func (e codeContainsError) Error() string {
-	return e.Err.Error()
-}
+func TestCodeContainsError_Error_Unwrap(t *testing.T) {
+	t.Run("codeContainsError - Error", func(t *testing.T) {
+		const expectedResultText = "test error text"
 
-// Unwrap returns previous error...
-func (e codeContainsError) Unwrap() error {
-	return e.Err
+		originError := errors.New(expectedResultText)
+
+		err := ErrorWithCode(originError, 100500)
+		if err.Error() != expectedResultText {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResultText)
+		}
+	})
+
+	t.Run("codeContainsError - UnWrap", func(t *testing.T) {
+		const expectedResultText = "test error"
+
+		originError := errors.New(expectedResultText)
+
+		err := ErrorWithCode(originError, 15)
+		if err.Error() != expectedResultText {
+			t.Errorf("error text not equal with expected. current: %s, expected: %s",
+				err.Error(), expectedResultText)
+		}
+
+		unwrappedErr := errors.Unwrap(err)
+
+		if !errors.Is(originError, unwrappedErr) {
+			t.Fatalf("error instance not equal with expected. current: %s, expected: %s",
+				unwrappedErr.Error(), originError.Error())
+		}
+	})
 }
