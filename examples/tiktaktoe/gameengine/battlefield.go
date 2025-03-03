@@ -79,7 +79,7 @@ func (w *battleFieldWorker) SetMovement(ctx context.Context,
 ) (*models.MatchResult, error) {
 	playerSymbol := w.roles.GetSymbolByPlayerUUID(playerUUID)
 	if playerSymbol != w.nextPlayer {
-		return nil, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrNotYourMovementOrder)
+		return nil, tinyerrors.ErrWithCode(ErrSetMove, types.TinyErrNotYourMovementOrder.Int())
 	}
 
 	x, y := position[0], position[1]
@@ -151,7 +151,7 @@ func newBattlefield(playersUUID [2]uuid.UUID,
 ) (*battleFieldWorker, error) {
 	matchUUID, err := uuid.NewV7()
 	if err != nil {
-		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield.Int())
 	}
 
 	return &battleFieldWorker{

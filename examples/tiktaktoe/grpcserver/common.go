@@ -93,19 +93,10 @@ type gameEngineService interface {
 	StartNewGame(ctx context.Context,
 		playerOneUUID,
 		playerTwoUUID uuid.UUID,
-		fieldSize uint,
 	) (*models.BattleField, error)
-	SetPlayerMovement(ctx context.Context,
-		matchUUID uuid.UUID,
-		playerUUID uuid.UUID,
-		movementPosition [2]uint8,
-	) (*models.MatchResult, error)
 	StopGame(ctx context.Context,
 		matchUUID uuid.UUID,
-	) (*models.MatchResult, error)
-	GetMatchStatus(ctx context.Context,
-		matchUUID uuid.UUID,
-	) (*models.MatchResult, error)
+	) error
 }
 
 type joinToLobbyHandlerService interface {

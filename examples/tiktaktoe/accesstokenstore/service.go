@@ -46,8 +46,7 @@ import (
 )
 
 var (
-	ErrTokensNotFound      = errors.New("access tokens not found")
-	ErrTokensAlreadyExists = errors.New("access tokens already exists")
+	ErrInconsistentAccessTokenData = errors.New("inconsistent access token data")
 )
 
 type store struct {
@@ -62,7 +61,7 @@ func (s *store) GetTokenInfoByTokenUUID(_ context.Context, tokenUUID uuid.UUID) 
 
 	tokensData, isExists := s.tokensMap[tokenUUID]
 	if !isExists {
-		return nil, tinyerrors.ErrWithCode(ErrTokensNotFound, types.TinyErrorAccessTokensNotFound)
+		return nil, tinyerrors.ErrWithCode(ErrInconsistentAccessTokenData, types.TinyErrorAccessTokensNotFound.Int())
 	}
 
 	return tokensData.Clone(), nil
@@ -74,7 +73,7 @@ func (s *store) AddTokenInfo(_ context.Context, tokensData *models.AccessToken) 
 
 	_, isExists := s.tokensMap[tokensData.AccessToken]
 	if isExists {
-		return tinyerrors.ErrWithCode(ErrTokensAlreadyExists, types.TinyErrorAccessTokensNotFound)
+		return tinyerrors.ErrWithCode(ErrInconsistentAccessTokenData, types.TinyErrorAccessTokensNotFound.Int())
 	}
 
 	s.tokensMap[tokensData.AccessToken] = *tokensData.Clone()

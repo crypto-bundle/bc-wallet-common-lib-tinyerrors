@@ -68,31 +68,31 @@ func ErrNoWrapOrNil(err error) error {
 	return nil
 }
 
-func ErrorWithCode(err error, code TinyErrCode) error {
+func ErrorWithCode(err error, code int) error {
 	return DefaultErrorFormatterSvc.ErrorWithCode(err, code)
 }
 
-func ErrWithCode(err error, code TinyErrCode) error {
+func ErrWithCode(err error, code int) error {
 	return DefaultErrorFormatterSvc.ErrWithCode(err, code)
 }
 
-func NewErrorWithCode(text string, code TinyErrCode) error {
+func NewErrorWithCode(text string, code int) error {
 	return DefaultErrorFormatterSvc.NewErrorWithCode(text, code)
 }
 
-func ErrorGetCode(err error) TinyErrCode {
+func ErrorGetCode(err error) int {
 	return DefaultErrorFormatterSvc.ErrorGetCode(err)
 }
 
-func ErrGetCode(err error) TinyErrCode {
+func ErrGetCode(err error) int {
 	return DefaultErrorFormatterSvc.ErrGetCode(err)
 }
 
-func ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+func ErrCodeIsOneOf(err error, codes ...int) (int, bool) {
 	return DefaultErrorFormatterSvc.ErrCodeIsOneOf(err, codes...)
 }
 
-func ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+func ErrorCodeIsOneOf(err error, codes ...int) (int, bool) {
 	return DefaultErrorFormatterSvc.ErrorCodeIsOneOf(err, codes...)
 }
 

@@ -34,11 +34,13 @@ package gameengine
 
 import (
 	"context"
-	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
-	"github.com/google/uuid"
 	"sync"
+
 	"tiktaktoe/models"
 	"tiktaktoe/types"
+
+	"github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors/pkg/tinyerrors"
+	"github.com/google/uuid"
 )
 
 type service struct {
@@ -48,6 +50,8 @@ type service struct {
 
 	battleFieldStoreDataSvc matchDataStoreService
 	accessTokensDataSvc     accessTokenStorageService
+
+	errFmtSvc errorFormatterService
 }
 
 func (s *service) StartNewGame(ctx context.Context,
@@ -66,17 +70,17 @@ func (s *service) StartNewGame(ctx context.Context,
 
 	tokensPairUUID, err := uuid.NewV7()
 	if err != nil {
-		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+		return nil, s.errFmtSvc.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield.Int())
 	}
 
 	xAccessTokenUUID, err := uuid.NewV7()
 	if err != nil {
-		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield.Int())
 	}
 
 	oAccessTokenUUID, err := uuid.NewV7()
 	if err != nil {
-		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield)
+		return nil, tinyerrors.ErrorWithCode(err, types.TinyErrorUnableToCreateBattlefield.Int())
 	}
 
 	s.mu.Lock()
@@ -86,7 +90,6 @@ func (s *service) StartNewGame(ctx context.Context,
 	bfData := &models.BattleField{
 		Players:        UUIDArr,
 		Size:           3,
-		Status:         types.MatchStillInProgress,
 		UUID:           bf.GetMatchUUID(),
 		TokensPairUUID: tokensPairUUID,
 	}
@@ -96,12 +99,17 @@ func (s *service) StartNewGame(ctx context.Context,
 		return nil, tinyerrors.ErrorNoWrap(err)
 	}
 
-	err = s.accessTokensDataSvc.AddTokens(ctx, &models.AccessTokensPair{
-		PairUUID: tokensPairUUID,
-		AccessTokens: [2]uuid.UUID{
-			xAccessTokenUUID,
-			oAccessTokenUUID,
-		},
+	err = s.accessTokensDataSvc.AddTokenInfo(ctx, &models.AccessToken{
+		PlayerUUID:  UUIDArr[0],
+		AccessToken: xAccessTokenUUID,
+	})
+	if err != nil {
+		return nil, tinyerrors.ErrorNoWrap(err)
+	}
+
+	err = s.accessTokensDataSvc.AddTokenInfo(ctx, &models.AccessToken{
+		PlayerUUID:  UUIDArr[1],
+		AccessToken: oAccessTokenUUID,
 	})
 	if err != nil {
 		return nil, tinyerrors.ErrorNoWrap(err)
@@ -115,7 +123,7 @@ func (s *service) StopGame(ctx context.Context,
 ) error {
 	bf, isExists := s.battleFields[matchUUID]
 	if !isExists {
-		return tinyerrors.ErrWithCode(ErrMatchWrongStatus, types.TinyErrCodeMatchNotRegistered)
+		return tinyerrors.ErrWithCode(ErrMatchWrongStatus, types.TinyErrCodeMatchNotRegistered.Int())
 	}
 
 	err := bf.StopMatch(ctx)
@@ -124,4 +132,8 @@ func (s *service) StopGame(ctx context.Context,
 	}
 
 	return nil
+}
+
+func NewGameEngineService(errFfmSvc errorFormatterService) *service {
+	return &service{errFmtSvc: errFfmSvc}
 }

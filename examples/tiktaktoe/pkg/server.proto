@@ -4,10 +4,6 @@ package pb;
 
 option go_package = "ticktaktoe/pb";
 
-enum ErrorReasons {
-  MATCH_ALREADY_EXISTS = 0;
-}
-
 enum MatchProgressStatus {
   MATCH_STATUS_PLACEHOLDER = 0;
   MATCH_STILL_IN_PROGRESS = 1;

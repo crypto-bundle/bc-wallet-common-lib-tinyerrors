@@ -41,7 +41,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrorWithCode", func(t *testing.T) {
 		const expectedResult = "test error"
 
-		err := ErrorWithCode(errors.New("test error"), TinyErrCodeInt(15))
+		err := ErrorWithCode(errors.New("test error"), 15)
 		if err.Error() != expectedResult {
 			t.Errorf("error text not equal with expected. current: %s, expected: %s",
 				err.Error(), expectedResult)
@@ -51,7 +51,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrWithCode", func(t *testing.T) {
 		const expectedResult = "test error"
 
-		err := ErrWithCode(errors.New("test error"), TinyErrCodeInt(15))
+		err := ErrWithCode(errors.New("test error"), 15)
 		if err.Error() != expectedResult {
 			t.Errorf("error text not equal with expected. current: %s, expected: %s",
 				err.Error(), expectedResult)
@@ -61,7 +61,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("NewErrorWithCode", func(t *testing.T) {
 		const expectedResult = "test error"
 
-		err := NewErrorWithCode(expectedResult, TinyErrCodeInt(15))
+		err := NewErrorWithCode(expectedResult, 15)
 		if err.Error() != expectedResult {
 			t.Errorf("error text not equal with expected. current: %s, expected: %s",
 				err.Error(), expectedResult)
@@ -71,7 +71,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrorGetCode", func(t *testing.T) {
 		const (
 			expectedResult = "test error"
-			expectedCode   = TinyErrCodeInt(42)
+			expectedCode   = 42
 		)
 
 		err := ErrorWithCode(errors.New("test error"), expectedCode)
@@ -89,7 +89,7 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrGetCode", func(t *testing.T) {
 		const (
 			expectedResult = "test error"
-			expectedCode   = TinyErrCodeInt(69)
+			expectedCode   = 69
 		)
 
 		err := ErrWithCode(errors.New("test error"), expectedCode)
@@ -107,9 +107,9 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrCodeIsOneOf", func(t *testing.T) {
 		const (
 			expectedResult = "test error"
-			expectedCode   = TinyErrCodeInt(69)
-			otherCodeOne   = TinyErrCodeInt(100500)
-			otherCodeTwo   = TinyErrCodeInt(100500)
+			expectedCode   = 69
+			otherCodeOne   = 100500
+			otherCodeTwo   = 100500
 		)
 
 		targetErr := ErrWithCode(errors.New("test error"), expectedCode)
@@ -119,7 +119,7 @@ func TestErrorFormatting(t *testing.T) {
 			t.Error("error is not one of expected codes")
 		}
 
-		if foundCode.Int() != expectedCode.Int() {
+		if foundCode != expectedCode {
 			t.Errorf("error code not equal with expected. current: %d, expected: %d",
 				foundCode, expectedCode)
 		}
@@ -138,9 +138,9 @@ func TestErrorFormatting(t *testing.T) {
 	t.Run("ErrorCodeIsOneOf", func(t *testing.T) {
 		const (
 			expectedResult = "test error"
-			expectedCode   = TinyErrCodeInt(69)
-			otherCodeOne   = TinyErrCodeInt(100502)
-			otherCodeTwo   = TinyErrCodeInt(100503)
+			expectedCode   = 69
+			otherCodeOne   = 100502
+			otherCodeTwo   = 100503
 		)
 
 		targetErr := ErrWithCode(errors.New("test error"), expectedCode)
@@ -150,7 +150,7 @@ func TestErrorFormatting(t *testing.T) {
 			t.Error("error is not one of expected codes")
 		}
 
-		if foundCode.Int() != expectedCode.Int() {
+		if foundCode != expectedCode {
 			t.Errorf("error code not equal with expected. current: %d, expected: %d",
 				foundCode, expectedCode)
 		}

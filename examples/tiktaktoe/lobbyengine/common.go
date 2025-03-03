@@ -42,3 +42,7 @@ type accessTokenStorageService interface {
 	GetTokenInfoByTokenUUID(_ context.Context, tokenUUID uuid.UUID) (*models.AccessToken, error)
 	AddTokenInfo(_ context.Context, tokensData *models.AccessToken) error
 }
+
+type lobbyEngineService interface {
+	JoinToLobby(ctx context.Context, playerUUID uuid.UUID) (token *models.AccessToken, err error)
+}

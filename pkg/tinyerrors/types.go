@@ -36,7 +36,7 @@ import "errors"
 
 type codeContainsError struct {
 	Err  error
-	code TinyErrCode
+	code int
 }
 
 // Error to string converter...

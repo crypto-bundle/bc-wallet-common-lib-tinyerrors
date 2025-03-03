@@ -60,13 +60,13 @@ func (c TinyErrCodeInt) I18n() string {
 }
 
 type errorCodeContainable interface {
-	ErrorWithCode(err error, code TinyErrCode) error
-	ErrWithCode(err error, code TinyErrCode) error
-	NewErrorWithCode(text string, code TinyErrCode) error
-	ErrorGetCode(err error) TinyErrCode
-	ErrGetCode(err error) TinyErrCode
-	ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool)
-	ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool)
+	ErrorWithCode(err error, code int) error
+	ErrWithCode(err error, code int) error
+	NewErrorWithCode(text string, code int) error
+	ErrorGetCode(err error) int
+	ErrGetCode(err error) int
+	ErrorCodeIsOneOf(err error, codes ...int) (int, bool)
+	ErrCodeIsOneOf(err error, codes ...int) (int, bool)
 }
 
 //nolint:interfacebloat //it's ok here, we need it we must use it as one big interface

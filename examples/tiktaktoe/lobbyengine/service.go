@@ -31,3 +31,22 @@
  */
 
 package lobbyengine
+
+import (
+	"context"
+	"github.com/google/uuid"
+	"tiktaktoe/models"
+)
+
+var _ lobbyEngineService = (*lobbyEngine)(nil)
+
+type lobbyEngine struct {
+}
+
+func (e *lobbyEngine) JoinToLobby(ctx context.Context, playerUUID uuid.UUID) (token *models.AccessToken, err error) {
+	return nil, nil
+}
+
+func NewLobbyEngine() *lobbyEngine {
+	return &lobbyEngine{}
+}

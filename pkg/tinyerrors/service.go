@@ -48,11 +48,11 @@ func (s *FmtService) ErrorNoWrapOrNil(err error) error {
 	return nil
 }
 
-func (s *FmtService) ErrGetCode(err error) TinyErrCode {
+func (s *FmtService) ErrGetCode(err error) int {
 	return s.ErrorGetCode(err)
 }
 
-func (s *FmtService) ErrorGetCode(err error) TinyErrCode {
+func (s *FmtService) ErrorGetCode(err error) int {
 	var ccErr *codeContainsError
 	if errors.As(err, &ccErr) {
 		return ccErr.code
@@ -63,40 +63,40 @@ func (s *FmtService) ErrorGetCode(err error) TinyErrCode {
 		return codeContainsErr.ErrorGetCode(err)
 	}
 
-	return nil
+	return -1
 }
 
-func (s *FmtService) ErrCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+func (s *FmtService) ErrCodeIsOneOf(err error, codes ...int) (int, bool) {
 	return s.ErrorCodeIsOneOf(err, codes...)
 }
 
-func (s *FmtService) ErrorCodeIsOneOf(err error, codes ...TinyErrCode) (TinyErrCode, bool) {
+func (s *FmtService) ErrorCodeIsOneOf(err error, codes ...int) (int, bool) {
 	errCode := s.ErrorGetCode(err)
-	if errCode == nil {
-		return nil, false
+	if errCode == -1 {
+		return -1, false
 	}
 
 	for _, targetCode := range codes {
-		if targetCode.Int() == errCode.Int() {
+		if targetCode == errCode {
 			return targetCode, true
 		}
 	}
 
-	return nil, false
+	return -1, false
 }
 
-func (s *FmtService) ErrWithCode(err error, code TinyErrCode) error {
+func (s *FmtService) ErrWithCode(err error, code int) error {
 	return s.ErrorWithCode(err, code)
 }
 
-func (s *FmtService) ErrorWithCode(err error, code TinyErrCode) error {
+func (s *FmtService) ErrorWithCode(err error, code int) error {
 	return &codeContainsError{
 		Err:  err,
 		code: code,
 	}
 }
 
-func (s *FmtService) NewErrorWithCode(text string, code TinyErrCode) error {
+func (s *FmtService) NewErrorWithCode(text string, code int) error {
 	return &codeContainsError{
 		Err:  errors.New(text),
 		code: code,
