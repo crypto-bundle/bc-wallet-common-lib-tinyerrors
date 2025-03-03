@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "ticktaktoe/pb";
+
+enum MatchProgressStatus {
+  MATCH_STATUS_PLACEHOLDER = 0;
+  MATCH_STILL_IN_PROGRESS = 1;
+  MATCH_ALREADY_ENDED = 2;
+}
+
+enum MovementStatus {
+  MOVE_OF_PLACEHOLDER = 0;
+  MOVE_OF_X = 1;
+  MOVE_OF_O = 2;
+}
+
+message MovementInfo {
+  string PlayerUUID = 1;
+  uint32 PositionX = 2;
+  uint32 PositionY = 3;
+}
+
+message MatchStatus {
+  MatchProgressStatus ProgressStatus = 1;
+  MovementStatus CurrentMovementStatus = 2;
+  MovementStatus NextMoveStatus = 3;
+}
+
+message MatchInfo {
+  string MatchUUID = 1;
+  MatchStatus MatchStatus = 2;
+}
+
+message JoinToLobbyRequest {
+  string UserUUID = 1;
+}
+
+message JoinToLobbyResponse {
+  string UserUUID = 1;
+  string TokenUUID = 2;
+}
+
+message PlayerMoveRequest {
+  string MatchUUID = 1;
+  string PlayerUUID = 2;
+  uint32 PositionX = 3;
+  uint32 PositionY = 4;
+}
+
+message PlayerMoveResponse {
+  string MatchUUID = 1;
+  string PlayerUUID = 2;
+  MatchStatus MatchStatus = 3;
+  uint32 PositionX = 4;
+  uint32 PositionY = 5;
+}
+
+message MatchStatusRequest {
+  string MatchUUID = 1;
+}
+
+message MatchStatusResponse {
+  string MatchUUID = 1;
+  MatchStatus MatchStatus = 2;
+}
+
+message StopMatchRequest {
+  string MatchUUID = 1;
+}
+
+message StopMatchResponse {
+  string MatchUUID = 1;
+  MatchStatus MatchStatus = 2;
+}
+
+message MathListRequest {
+}
+
+message MathListResponse {
+  repeated MatchInfo MatchList = 1;
+}
+
+message MatchMovementListRequest {
+  string MatchUUID = 1;
+}
+
+message MatchMovementListResponse {
+  MatchInfo MatchInfo = 1;
+  repeated MovementInfo MovementList = 2;
+}
+
+service GameApi {
+  rpc JoinToLobby                 (JoinToLobbyRequest)               returns (JoinToLobbyResponse) {}
+  rpc StopMatch                     (StopMatchRequest)                returns (StopMatchResponse) {}
+  rpc PlayerMove                      (PlayerMoveRequest)                  returns (PlayerMoveResponse) {}
+  rpc GetMatchStatus                    (MatchStatusRequest)               returns (MatchStatusResponse) {}
+  rpc GetMatchMovementList            (MatchMovementListRequest)         returns (MatchMovementListResponse) {}
+  rpc GetMatchList                    (MathListRequest)                  returns (MathListResponse) {}
+}
