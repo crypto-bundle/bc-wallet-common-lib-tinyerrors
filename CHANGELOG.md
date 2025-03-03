@@ -1,6 +1,11 @@
 # Change Log
 
-## [v0.0.1] - 10.10.2024
+## [v0.0.2] - 03.03.2025
+### Fix
+* Fixed Unwrap method
+* Added unit-tests for basic tiny-error type(`codeContainsError`) for implementation of Error/Unwrap interface 
+
+## [v0.0.1] - 03.03.2025
 ### Added
 * Create lib-tinyerrors library
 * Added linters checks
