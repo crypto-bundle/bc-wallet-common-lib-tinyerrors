@@ -1,6 +1,6 @@
 module signer
 
-go 1.22
+go 1.23
 
 replace github.com/crypto-bundle/bc-wallet-common-lib-tinyerrors => ../..
 
